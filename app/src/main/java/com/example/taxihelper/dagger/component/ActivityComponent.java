@@ -22,6 +22,7 @@ import android.content.Context;
 import com.example.taxihelper.dagger.module.ActivityModule;
 import com.example.taxihelper.dagger.scope.ContextLife;
 import com.example.taxihelper.dagger.scope.PerActivity;
+import com.example.taxihelper.mvp.ui.activities.LoginActivity;
 
 import dagger.Component;
 
@@ -36,6 +37,8 @@ public interface ActivityComponent {
     Context getApplicationContext();
 
     Activity getActivity();
+    
+    void inject(LoginActivity loginActivity);
 
 
 }

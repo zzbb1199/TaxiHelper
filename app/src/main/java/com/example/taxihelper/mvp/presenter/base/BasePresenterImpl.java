@@ -16,6 +16,7 @@ public class BasePresenterImpl<T extends BaseView> implements BasePresenter {
 
     //声明为protected 供子类使用
     protected T mView;
+    protected String TAG = this.getClass().getSimpleName();
 
 
     @Override

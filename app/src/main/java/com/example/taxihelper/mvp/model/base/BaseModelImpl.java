@@ -5,10 +5,10 @@ package com.example.taxihelper.mvp.model.base;
  */
 
 
+import com.example.taxihelper.constant.Constant;
 import com.example.taxihelper.mvp.entity.Data;
 import com.example.taxihelper.net.Api;
 import com.example.taxihelper.net.ApiException;
-import com.example.taxihelper.net.ResponseCons;
 
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
@@ -23,18 +23,31 @@ import rx.functions.Func1;
 public class BaseModelImpl {
     private OkHttpClient client = new OkHttpClient.Builder()
             .build();
-    private Retrofit mRetrofit;
-    protected Api api;
+    private Retrofit mRetrofit1;
+    private Retrofit mRetrofit2;
 
     public BaseModelImpl() {
-        mRetrofit = new Retrofit.Builder()
-                .baseUrl(ResponseCons.BASE_URL)
+        mRetrofit1 = new Retrofit.Builder()
+                .baseUrl(Constant.SHENZHOU_TEST_AUTH+"/")
                 .client(client)
                 .addConverterFactory(GsonConverterFactory.create())
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .build();
-        api = mRetrofit.create(Api.class);
+        mRetrofit2 = new Retrofit.Builder()
+                .baseUrl(Constant.SHENZHOU_TEST_API+"/")
+                .client(client)
+                .addConverterFactory(GsonConverterFactory.create())
+                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+                .build();
     }
+    
+    protected Api getAuthApi(){
+        return mRetrofit1.create(Api.class);
+    }
+    protected Api getApi(){
+        return mRetrofit2.create(Api.class);
+    }
+    
 
     public Observable filterStatus(Observable observable) {
         return observable.map(new ResultFilter());

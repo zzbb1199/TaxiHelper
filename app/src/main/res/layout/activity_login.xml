@@ -4,7 +4,14 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent">
     <Button
-        android:id="@+id/button"
-        android:layout_width="wrap_content"
+        android:id="@+id/shenzhou_auth"
+        android:text="神州授权"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
+    <Button
+        android:id="@+id/didi_auth"
+        android:text="滴滴授权"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+    
 </LinearLayout>

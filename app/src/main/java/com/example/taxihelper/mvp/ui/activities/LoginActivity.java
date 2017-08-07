@@ -1,0 +1,101 @@
+package com.example.taxihelper.mvp.ui.activities;
+
+import android.app.AlertDialog;
+import android.util.Log;
+import android.view.View;
+import android.widget.Toast;
+
+import com.example.taxihelper.R;
+import com.example.taxihelper.constant.Constant;
+import com.example.taxihelper.mvp.contract.GainAccessTokenContract;
+import com.example.taxihelper.mvp.entity.GainAccessToken;
+import com.example.taxihelper.mvp.presenter.GainAccessTokenPresenterImpl;
+import com.example.taxihelper.mvp.ui.activities.base.RxBusSubscriberBaseActivity;
+import com.example.taxihelper.utils.system.RxBus;
+import com.example.taxihelper.utils.system.SpUtil;
+import com.example.taxihelper.utils.system.ToActivityUtil;
+
+import javax.inject.Inject;
+
+import butterknife.OnClick;
+import rx.functions.Action1;
+
+/**
+ * Created by 张兴锐 on 2017/8/7.
+ */
+
+public class LoginActivity extends RxBusSubscriberBaseActivity implements GainAccessTokenContract.View {
+    
+    
+    @Inject
+    GainAccessTokenPresenterImpl mPresenter;
+    
+    @Override
+    public void initInjector() {
+        mActivityComponent.inject(this);
+        mPresenter.injectView(this);
+    }
+
+    @Override
+    public void initViews() {
+        
+    }
+
+    @Override
+    public int getLayout() {
+        return R.layout.activity_login;
+    }
+
+    @Override
+    public void initRxBus() {
+        RxBus.getDefault().toObservable(String.class)
+                .subscribe(new Action1<String>() {
+                    @Override
+                    public void call(String s) {
+                        mPresenter.gainAccessToken(Constant.SHENZHOU_CLIENT_ID,
+                                Constant.SHENZHOU_CLIENT_PASSWORD,"authorization_code",s,Constant.SHENZHOUE_REDIRECT_URL);
+                    }
+                });
+    }
+    
+
+    @OnClick({R.id.shenzhou_auth, R.id.didi_auth})
+    public void onViewClicked(View view) {
+        switch (view.getId()) {
+            case R.id.shenzhou_auth:
+                ToActivityUtil.toNextActivity(this, ShenZhouAuthActivity.class);
+                break;
+            case R.id.didi_auth:
+                break;
+        }
+    }
+
+    AlertDialog dialog;
+    @Override
+    public void showProgress() {
+        dialog = new AlertDialog.Builder(LoginActivity.this)
+                .setTitle("提示:")
+                .setMessage("正在加载请稍后...")
+                .setCancelable(false).create();
+        dialog.show();
+    }
+
+    @Override
+    public void hideProgress() {
+        dialog.dismiss();
+    }
+
+    @Override
+    public void showMsg(String msg) {
+        Toast.makeText(this,msg,Toast.LENGTH_SHORT);
+    }
+
+    @Override
+    public void gainAccessToken(GainAccessToken gainAccessToken) {
+        Log.i(TAG,gainAccessToken.toString());
+        //将信息进行固化
+        SpUtil.putString(this,Constant.ACCESS_TOKEN,gainAccessToken.getAccess_token());
+        SpUtil.putString(this,Constant.REFRESH_ACCESS_TOKEN,gainAccessToken.getRefresh_token());
+        
+    }
+}
