@@ -46,11 +46,11 @@ public class LoginActivity extends RxBusSubscriberBaseActivity implements GainAc
             ToActivityUtil.toNextActivity(this,ShenZhouAuthActivity.class);
             return;
         }
-        if (expiredTime > System.currentTimeMillis()){
+        if (expiredTime <= System.currentTimeMillis()){
             mPresenter.refreshAccessToken(Constant.SHENZHOU_CLIENT_ID,Constant.SHENZHOU_CLIENT_PASSWORD,
                     Constant.REFRESH_TYPE,SpUtil.getString(this,Constant.REFRESH_ACCESS_TOKEN,"-1"));
         }
-        if (expiredTime < System.currentTimeMillis()){
+        if (expiredTime > System.currentTimeMillis()){
             //还在授权期限内
             ToActivityUtil.toNextActivityAndFinish(this,ShenZhouTaxiActivity.class);
             return;
