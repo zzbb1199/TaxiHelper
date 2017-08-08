@@ -17,6 +17,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".mvp.ui.activities.ShenZhouAuthActivity"></activity>
+        <activity android:name=".mvp.ui.activities.ShenZhouTaxiActivity"></activity>
 
     </application>
 

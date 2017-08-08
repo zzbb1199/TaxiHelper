@@ -34,5 +34,8 @@ public class Constant {
      */
     public static final String ACCESS_TOKEN = "access_token";
     public static final String REFRESH_ACCESS_TOKEN ="refresh_access_token";
+    public static final String EXPIRED_TIME = "expired_time";
+    
+    public static final String REFRESH_TYPE = "refresh_token";
 
 }

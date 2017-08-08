@@ -10,6 +10,7 @@ import com.example.taxihelper.R;
 import com.example.taxihelper.constant.Constant;
 import com.example.taxihelper.mvp.ui.activities.base.BaseActivity;
 import com.example.taxihelper.utils.system.RxBus;
+import com.example.taxihelper.utils.system.SpUtil;
 
 import butterknife.InjectView;
 
@@ -53,7 +54,31 @@ public class ShenZhouAuthActivity extends BaseActivity {
                 super.onPageFinished(view, url);
                 count += 1;
                 Log.i(TAG, count + "");
-                if (count == 3) {
+                
+                if (url.equals("client_id=A73371C10000030A&redirect_uri=http://nmid.cqupt.edu.cn/&response_type=code&scope=read&mobile=15086943358")){
+                    //如果得到了如上所示的url，
+                    String accessToken = SpUtil.getString(ShenZhouAuthActivity.this,Constant.ACCESS_TOKEN,null);
+                    if (accessToken != null){
+                        RxBus.getDefault().post(accessToken);
+                        finish();
+                        return;
+                    }
+                    //如果过期了这个返回值是什么？？？，暂时未知
+                }
+                
+                if (count == 3){//已经在授权期限内
+                    String redirectUrl = url.split("[?]")[0];
+                    if (redirectUrl.equals(Constant.SHENZHOUE_REDIRECT_URL)){
+                        //判定是否跳转到最后
+                        String code_url = url.split("[?]")[1];
+                        String code = code_url.substring(code_url.indexOf("=")+1, code_url.length());
+                        RxBus.getDefault().post(code);
+                        finish();
+                        return;
+                    }
+                }
+                
+                if (count == 4) {//为重新获取了code
                     //4次以后
                     String code_url = url.split("[?]")[1];
                     String code = code_url.substring(code_url.indexOf("=")+1, code_url.length());

@@ -56,10 +56,10 @@ public class BaseModelImpl {
     private class ResultFilter<T> implements Func1<Data<T>, T> {
         @Override
         public T call(Data<T> tHttpBean) {
-            if (tHttpBean.getCode() != 200) {
+            if (tHttpBean.getCode() != 1) {
                 throw new ApiException(tHttpBean.getCode());
             }
-            return tHttpBean.getData();
+            return tHttpBean.getContent();
         }
     }
 }

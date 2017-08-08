@@ -12,7 +12,7 @@ public class StatusUtils {
     }
     private static StatusResult mStatusResult = new StatusResult();
     public static StatusResult judgeStatus(int status) {
-        String desc = "";
+        String desc = "failed";
         boolean isSuccess = false;
         switch (status) {
             case ResponseCons.STATUS_SUCCESS:
