@@ -1,14 +1,24 @@
 package com.example.taxihelper.mvp.ui.activities;
 
 import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
+import android.widget.TextView;
 
 import com.amap.api.maps.AMap;
 import com.amap.api.maps.MapView;
 import com.amap.api.maps.model.MyLocationStyle;
+import com.amap.api.services.core.LatLonPoint;
+import com.amap.api.services.geocoder.GeocodeResult;
+import com.amap.api.services.geocoder.GeocodeSearch;
+import com.amap.api.services.geocoder.RegeocodeAddress;
+import com.amap.api.services.geocoder.RegeocodeQuery;
+import com.amap.api.services.geocoder.RegeocodeResult;
 import com.example.taxihelper.App;
 import com.example.taxihelper.R;
 import com.example.taxihelper.dagger.component.ActivityComponent;
@@ -20,16 +30,19 @@ import com.example.taxihelper.mvp.presenter.GetCityInfoPresenterImpl;
 import com.example.taxihelper.utils.image.DialogProgressUtils;
 import com.example.taxihelper.utils.others.ToastUtil;
 import com.example.taxihelper.utils.system.ActivityStack;
+import com.example.taxihelper.widget.CircleView;
 
 import javax.inject.Inject;
 
 import butterknife.ButterKnife;
+import butterknife.InjectView;
+import butterknife.OnClick;
 
 /**
  * Created by 张兴锐 on 2017/8/8.
  */
 
-public class ShenZhouTaxiActivity extends AppCompatActivity implements GetCityInfoContract.View, AMap.OnMyLocationChangeListener {
+public class ShenZhouTaxiActivity extends AppCompatActivity implements GetCityInfoContract.View, AMap.OnMyLocationChangeListener, GeocodeSearch.OnGeocodeSearchListener {
 
     /**
      * 测试用经纬度
@@ -38,6 +51,12 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements GetCityIn
     private final double slot = 106.33;
     //唯独
     private final double slat = 29.35;
+    @InjectView(R.id.location_dot)
+    CircleView locationDot;
+    @InjectView(R.id.location_text)
+    TextView locationText;
+    @InjectView(R.id.go_to_text)
+    TextView goToText;
     private ActivityComponent mActivityComponent;
     private String TAG = this.getClass().getSimpleName();
 
@@ -48,6 +67,7 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements GetCityIn
      * 地图相关
      */
     MyLocationStyle myLocationStyle;
+    GeocodeSearch geocodeSearch;
     MapView mMapView = null;
 
     public void initInjector() {
@@ -101,7 +121,10 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements GetCityIn
         aMap.setMyLocationStyle(myLocationStyle);//设置定位蓝点的Style
         aMap.setMyLocationEnabled(true);// 设置为true表示启动显示定位蓝点，false表示隐藏定位蓝点并不进行定位，默认是false。
         aMap.setOnMyLocationChangeListener(this);
-    
+
+        //搜索功能初始化
+        geocodeSearch = new GeocodeSearch(this);
+        geocodeSearch.setOnGeocodeSearchListener(this);
 
     }
 
@@ -112,7 +135,60 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements GetCityIn
      */
     @Override
     public void onMyLocationChange(Location location) {
-        Log.i(TAG, location.toString());
+        //逆地址解析
+        double lat = location.getLatitude();
+        double lot = location.getLongitude();
+        LatLonPoint latLonPoint = new LatLonPoint(lat, lot);
+        //发起逆地址解析请求
+        RegeocodeQuery query = new RegeocodeQuery(latLonPoint, 200, GeocodeSearch.AMAP);
+        geocodeSearch.getFromLocationAsyn(query);
+    }
+
+    private String nowCityCode;
+    //    private TextWatcher tw = new TextWatcher() {
+    //        @Override
+    //        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+    //            
+    //        }
+    //
+    //        @Override
+    //        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+    //            //每次文字发生改变以后进行一次搜索请求
+    //            //设置查询参数
+    //            GeocodeQuery query = new GeocodeQuery(charSequence.toString(),nowCityCode);
+    //            geocodeSearch.getFromLocationNameAsyn(query);//发起搜索请求
+    //        }
+    //
+    //        @Override
+    //        public void afterTextChanged(Editable editable) {
+    //            
+    //        }
+    //    };
+    boolean userChooseLocation = false;
+    //逆地址解析回调
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    @Override
+    public void onRegeocodeSearched(RegeocodeResult regeocodeResult, int i) {
+        if (i == 1000) {
+            RegeocodeAddress address = regeocodeResult.getRegeocodeAddress();
+            nowCityCode = address.getCityCode();
+            Log.i(TAG, address.getBuilding().toString());
+            if (!userChooseLocation){
+                //如果不是用户自己选择了地点，那么就自动定位
+                locationText.setText(address.getFormatAddress());
+                //定位成功，显示为绿色
+                locationDot.setColor(getColor(R.color.green_500));
+            }
+        }
+    }
+    
+    //返回了搜索结果
+    @Override
+    public void onGeocodeSearched(GeocodeResult geocodeResult, int i) {
+        if (i == 1000) {
+            Log.i(TAG, "请求搜索成功");
+            Log.i(TAG, geocodeResult.getGeocodeAddressList().toString());
+        }
     }
 
 
@@ -173,4 +249,13 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements GetCityIn
     }
 
 
+    @OnClick({R.id.location_view, R.id.go_to_view})
+    public void onViewClicked(View view) {
+        switch (view.getId()) {
+            case R.id.location_view:
+                break;
+            case R.id.go_to_view:
+                break;
+        }
+    }
 }
