@@ -1,5 +1,6 @@
 package com.example.taxihelper.mvp.ui.activities;
 
+import android.content.Intent;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
@@ -21,15 +22,18 @@ import com.amap.api.services.geocoder.RegeocodeQuery;
 import com.amap.api.services.geocoder.RegeocodeResult;
 import com.example.taxihelper.App;
 import com.example.taxihelper.R;
+import com.example.taxihelper.constant.Constant;
 import com.example.taxihelper.dagger.component.ActivityComponent;
 import com.example.taxihelper.dagger.component.DaggerActivityComponent;
 import com.example.taxihelper.dagger.module.ActivityModule;
 import com.example.taxihelper.mvp.contract.GetCityInfoContract;
 import com.example.taxihelper.mvp.entity.CityInfo;
+import com.example.taxihelper.mvp.entity.LocationChoose;
 import com.example.taxihelper.mvp.presenter.GetCityInfoPresenterImpl;
 import com.example.taxihelper.utils.image.DialogProgressUtils;
 import com.example.taxihelper.utils.others.ToastUtil;
 import com.example.taxihelper.utils.system.ActivityStack;
+import com.example.taxihelper.utils.system.RxBus;
 import com.example.taxihelper.widget.CircleView;
 
 import javax.inject.Inject;
@@ -37,6 +41,7 @@ import javax.inject.Inject;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
+import rx.functions.Action1;
 
 /**
  * Created by 张兴锐 on 2017/8/8.
@@ -97,6 +102,18 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements GetCityIn
         //在activity执行onCreate时执行mMapView.onCreate(savedInstanceState)，创建地图
         mMapView.onCreate(savedInstanceState);
         initViews();
+        initRxBus();
+    }
+
+    private void initRxBus() {
+        RxBus.getDefault().toObservable(LocationChoose.class)
+                .subscribe(new Action1<LocationChoose>() {
+                    @Override
+                    public void call(LocationChoose locationChoose) {
+                        userChooseLocation = true;
+                        locationText.setText(locationChoose.getLocatoin());
+                    }
+                });
     }
 
 
@@ -144,26 +161,8 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements GetCityIn
         geocodeSearch.getFromLocationAsyn(query);
     }
 
-    private String nowCityCode;
-    //    private TextWatcher tw = new TextWatcher() {
-    //        @Override
-    //        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-    //            
-    //        }
-    //
-    //        @Override
-    //        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-    //            //每次文字发生改变以后进行一次搜索请求
-    //            //设置查询参数
-    //            GeocodeQuery query = new GeocodeQuery(charSequence.toString(),nowCityCode);
-    //            geocodeSearch.getFromLocationNameAsyn(query);//发起搜索请求
-    //        }
-    //
-    //        @Override
-    //        public void afterTextChanged(Editable editable) {
-    //            
-    //        }
-    //    };
+    private String nowCity;
+    private String addressStr;
     boolean userChooseLocation = false;
     //逆地址解析回调
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -171,11 +170,12 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements GetCityIn
     public void onRegeocodeSearched(RegeocodeResult regeocodeResult, int i) {
         if (i == 1000) {
             RegeocodeAddress address = regeocodeResult.getRegeocodeAddress();
-            nowCityCode = address.getCityCode();
+            nowCity = address.getCity();
             Log.i(TAG, address.getBuilding().toString());
             if (!userChooseLocation){
                 //如果不是用户自己选择了地点，那么就自动定位
-                locationText.setText(address.getFormatAddress());
+                addressStr = address.getFormatAddress();
+                locationText.setText(addressStr);
                 //定位成功，显示为绿色
                 locationDot.setColor(getColor(R.color.green_500));
             }
@@ -185,10 +185,6 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements GetCityIn
     //返回了搜索结果
     @Override
     public void onGeocodeSearched(GeocodeResult geocodeResult, int i) {
-        if (i == 1000) {
-            Log.i(TAG, "请求搜索成功");
-            Log.i(TAG, geocodeResult.getGeocodeAddressList().toString());
-        }
     }
 
 
@@ -253,6 +249,11 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements GetCityIn
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.location_view:
+                //跳转到定位选择
+                Intent intent = new Intent(this,LocationChooseActivity.class);
+                intent.putExtra(Constant.CURRENT_CITY,nowCity);
+                intent.putExtra(Constant.CURRENT_LOCATION,addressStr);
+                startActivity(intent);
                 break;
             case R.id.go_to_view:
                 break;

@@ -7,6 +7,7 @@
     
     <color name="primary_text">#212121</color>
     <color name="secondary_text">#757575</color>
+    <color name="search_text">#646464</color>
 
     <color name="red_50">#ffebff</color>
     <color name="red_100">#ffcdd2</color>

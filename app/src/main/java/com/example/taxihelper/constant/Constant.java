@@ -37,5 +37,9 @@ public class Constant {
     public static final String EXPIRED_TIME = "expired_time";
     
     public static final String REFRESH_TYPE = "refresh_token";
+    
+    //
+    public static final String CURRENT_CITY = "current_city";
+    public static final String CURRENT_LOCATION = "location";
 
 }

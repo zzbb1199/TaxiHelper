@@ -34,8 +34,8 @@
         </activity>
         <activity android:name=".mvp.ui.activities.ShenZhouAuthActivity"></activity>
         <activity android:name=".mvp.ui.activities.ShenZhouTaxiActivity"></activity>
-
-
+        <activity android:name=".mvp.ui.activities.LocationChooseActivity"></activity>
+        <activity android:name=".mvp.ui.activities.CityChooseActivity"></activity>
 
         <meta-data
             android:name="com.amap.api.v2.apikey"
