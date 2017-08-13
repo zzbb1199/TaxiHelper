@@ -41,5 +41,10 @@ public class Constant {
     //
     public static final String CURRENT_CITY = "current_city";
     public static final String CURRENT_LOCATION = "location";
+    public static final String TYPE = "type";
+    public static final String TYPE_START = "start";
+    public static final String TYPE_END = "end";
+    
+    public static final String SERVICE_ID = "serviceId";
 
 }

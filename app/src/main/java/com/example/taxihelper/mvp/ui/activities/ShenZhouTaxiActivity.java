@@ -253,6 +253,8 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements GetCityIn
                 Intent intent = new Intent(this,LocationChooseActivity.class);
                 intent.putExtra(Constant.CURRENT_CITY,nowCity);
                 intent.putExtra(Constant.CURRENT_LOCATION,addressStr);
+                intent.putExtra(Constant.TYPE,Constant.TYPE_START);
+                intent.putExtra(Constant.SERVICE_ID,7);
                 startActivity(intent);
                 break;
             case R.id.go_to_view:

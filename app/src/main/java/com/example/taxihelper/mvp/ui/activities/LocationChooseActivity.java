@@ -49,7 +49,8 @@ public class LocationChooseActivity extends RxBusSubscriberBaseActivity implemen
     InputtipsQuery query;
     Inputtips inputTips;
 
-
+    String type;
+    Integer serviceId;
     @Override
     public void initInjector() {
 
@@ -59,6 +60,8 @@ public class LocationChooseActivity extends RxBusSubscriberBaseActivity implemen
     public void initViews() {
         currentCity = getIntent().getStringExtra(Constant.CURRENT_CITY);
         currentLocation = getIntent().getStringExtra(Constant.CURRENT_LOCATION);
+        type = getIntent().getStringExtra(Constant.TYPE);
+        serviceId = getIntent().getIntExtra(Constant.SERVICE_ID,-1);
         if (currentCity != null) {
             cityChooseTv.setText(currentCity);
         } else {
@@ -90,6 +93,8 @@ public class LocationChooseActivity extends RxBusSubscriberBaseActivity implemen
     public void onViewClicked() {
         Intent intent = new Intent(this, CityChooseActivity.class);
         intent.putExtra(Constant.CURRENT_CITY, currentCity);
+        intent.putExtra(Constant.TYPE,type);
+        intent.putExtra(Constant.SERVICE_ID,serviceId);
         startActivity(intent);
     }
 
