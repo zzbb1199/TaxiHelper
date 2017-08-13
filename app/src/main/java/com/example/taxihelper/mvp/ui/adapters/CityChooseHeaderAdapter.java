@@ -10,6 +10,9 @@ import com.example.taxihelper.R;
 import com.example.taxihelper.widget.StickyHeaderDecoration;
 import com.jude.easyrecyclerview.adapter.BaseViewHolder;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Created by 张兴锐 on 2017/8/13.
  */
@@ -17,6 +20,7 @@ import com.jude.easyrecyclerview.adapter.BaseViewHolder;
 public class CityChooseHeaderAdapter implements StickyHeaderDecoration.IStickyHeaderAdapter<CityChooseHeaderAdapter.HeaderHolder> {
     private Context mContext;
     private CityChooseContentAdapter adapter;
+    private Map<String,Integer> headerMap = new HashMap<>();
 
     public CityChooseHeaderAdapter(Context mContext, CityChooseContentAdapter adapter) {
         this.mContext = mContext;
@@ -25,16 +29,15 @@ public class CityChooseHeaderAdapter implements StickyHeaderDecoration.IStickyHe
     @Override
     public long getHeaderId(int position) {
         if (position == 0){
+            headerMap.put(String.valueOf(adapter.getItem(0).getCitySpell().toCharArray()[0]),position);
             return position;
         }
-        char nowLetter = adapter.getAllData().get(position).getCitySpell().toCharArray()[0];
-        char lastLetter = adapter.getAllData().get(position - 1).getCitySpell().toCharArray()[0];
-        if (nowLetter != lastLetter) {
-            //更新字母
-            return position;
+        String nowLetter = String.valueOf(adapter.getItem(position).getCitySpell().toCharArray()[0]);
+        if (!headerMap.containsKey(nowLetter)) {
+            headerMap.put(String.valueOf(nowLetter),position);
+            return  position;
         }
-        //如果还是上一个字母
-        return position - 1;
+        return headerMap.get(nowLetter);
     }
 
     @Override
