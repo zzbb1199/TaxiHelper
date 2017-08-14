@@ -1,80 +1,110 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
-              xmlns:app="http://schemas.android.com/apk/res-auto"
               android:orientation="vertical">
 
-    <android.support.v7.widget.CardView
+    <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="8dp">
+        android:background="@color/white"
+        android:orientation="vertical">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/colorPrimary">
+        </android.support.v7.widget.Toolbar>
 
         <LinearLayout
+            android:id="@+id/type_linear"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:layout_height="56dp"
+            android:orientation="horizontal">
 
-            <LinearLayout
-                android:id="@+id/location_view"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:orientation="horizontal">
-
-                <com.example.taxihelper.widget.CircleView
-                    android:id="@+id/location_dot"
-                    android:layout_width="10dp"
-                    android:layout_height="10dp"
-                    android:layout_gravity="center"
-                    android:layout_marginLeft="16dp"
-                    android:background="@color/white"
-                    app:color="@color/grey_500"/>
-
-                <TextView
-                    android:id="@+id/location_text"
-                    android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:gravity="start|center"
-                    android:paddingLeft="16dp"
-                    android:text="正在为您定位中..."
-                    android:textColor="@color/primary_text"/>
-            </LinearLayout>
-
-            <include
-                layout="@layout/view_search_divider"
-                ></include>
-
-            <LinearLayout
-                android:id="@+id/go_to_view"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:orientation="horizontal">
-
-                <com.example.taxihelper.widget.CircleView
-                    android:layout_width="10dp"
-                    android:layout_height="10dp"
-                    android:layout_gravity="center"
-                    android:layout_marginLeft="16dp"
-                    android:background="@color/white"
-                    app:color="@color/red_500"/>
-
-                <TextView
-                    android:id="@+id/go_to_text"
-                    android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:gravity="start|center"
-                    android:paddingLeft="16dp"
-                    android:text="重庆"
-                    android:textColor="@color/primary_text"/>
-            </LinearLayout>
         </LinearLayout>
-    </android.support.v7.widget.CardView>
+    </android.support.design.widget.AppBarLayout>
 
-    <com.amap.api.maps.MapView
-        android:id="@+id/map"
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-    </com.amap.api.maps.MapView>
+
+        <android.support.v7.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerInParent="true"
+            android:layout_margin="8dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:id="@+id/location_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:orientation="horizontal">
+
+                    <com.example.taxihelper.widget.CircleView
+                        android:id="@+id/location_dot"
+                        android:layout_width="10dp"
+                        android:layout_height="10dp"
+                        android:layout_gravity="center"
+                        android:layout_marginLeft="16dp"
+                        android:background="@color/white"
+                        app:color="@color/grey_500"/>
+
+                    <TextView
+                        android:id="@+id/location_text"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:gravity="start|center"
+                        android:paddingLeft="16dp"
+                        android:text="正在为您定位中..."
+                        android:textColor="@color/primary_text"/>
+                </LinearLayout>
+
+                <include
+                    layout="@layout/view_search_divider"
+                    ></include>
+
+                <LinearLayout
+                    android:id="@+id/go_to_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:orientation="horizontal">
+
+                    <com.example.taxihelper.widget.CircleView
+                        android:layout_width="10dp"
+                        android:layout_height="10dp"
+                        android:layout_gravity="center"
+                        android:layout_marginLeft="16dp"
+                        android:background="@color/white"
+                        app:color="@color/red_500"/>
+
+                    <TextView
+                        android:id="@+id/go_to_text"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:gravity="start|center"
+                        android:paddingLeft="16dp"
+                        android:text="重庆"
+                        android:textColor="@color/primary_text"/>
+                </LinearLayout>
+            </LinearLayout>
+        </android.support.v7.widget.CardView>
+
+        <com.amap.api.maps.MapView
+            android:id="@+id/map"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+        </com.amap.api.maps.MapView>
+    </RelativeLayout>
+
 </LinearLayout>

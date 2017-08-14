@@ -1,14 +1,20 @@
 package com.example.taxihelper.mvp.ui.activities;
 
+import android.annotation.TargetApi;
 import android.content.Intent;
+import android.graphics.Color;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.amap.api.maps.AMap;
@@ -31,6 +37,7 @@ import com.example.taxihelper.mvp.entity.CityInfo;
 import com.example.taxihelper.mvp.entity.LocationChoose;
 import com.example.taxihelper.mvp.presenter.GetCityInfoPresenterImpl;
 import com.example.taxihelper.utils.image.DialogProgressUtils;
+import com.example.taxihelper.utils.others.AccessTokenUtils;
 import com.example.taxihelper.utils.others.ToastUtil;
 import com.example.taxihelper.utils.system.ActivityStack;
 import com.example.taxihelper.utils.system.RxBus;
@@ -49,19 +56,19 @@ import rx.functions.Action1;
 
 public class ShenZhouTaxiActivity extends AppCompatActivity implements GetCityInfoContract.View, AMap.OnMyLocationChangeListener, GeocodeSearch.OnGeocodeSearchListener {
 
-    /**
-     * 测试用经纬度
-     */
-    //经度
-    private final double slot = 106.33;
-    //唯独
-    private final double slat = 29.35;
+
     @InjectView(R.id.location_dot)
     CircleView locationDot;
     @InjectView(R.id.location_text)
     TextView locationText;
     @InjectView(R.id.go_to_text)
     TextView goToText;
+    @InjectView(R.id.toolbar)
+    Toolbar mToolBar;
+    @InjectView(R.id.type_linear)
+    LinearLayout typeLinear;
+    @InjectView(R.id.map)
+    MapView map;
     private ActivityComponent mActivityComponent;
     private String TAG = this.getClass().getSimpleName();
 
@@ -120,7 +127,10 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements GetCityIn
     public void initViews() {
         //首先获取当前城市位置
         //        mPresenter.getCityInfo(AccessTokenUtils.getAccessToken(),slat,slot);
-
+        setSupportActionBar(mToolBar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        mToolBar.setTitle("TaxiHelper");
+        mToolBar.setTitleTextColor(Color.WHITE);
         //初始化地图控制器对象
         AMap aMap = null;
         if (aMap == null) {
@@ -150,6 +160,8 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements GetCityIn
      *
      * @param location
      */
+    private boolean hasRequestType = false;
+
     @Override
     public void onMyLocationChange(Location location) {
         //逆地址解析
@@ -159,11 +171,17 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements GetCityIn
         //发起逆地址解析请求
         RegeocodeQuery query = new RegeocodeQuery(latLonPoint, 200, GeocodeSearch.AMAP);
         geocodeSearch.getFromLocationAsyn(query);
+        if (!userChooseLocation && !hasRequestType) {
+            //如果不是用户自己选择城市，以当前定位的地方进行请求城市车辆的服务类型
+            mPresenter.getCityInfo(AccessTokenUtils.getAccessToken(), lat, lot);
+            hasRequestType = true;
+        }
     }
 
     private String nowCity;
     private String addressStr;
     boolean userChooseLocation = false;
+
     //逆地址解析回调
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
@@ -172,7 +190,7 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements GetCityIn
             RegeocodeAddress address = regeocodeResult.getRegeocodeAddress();
             nowCity = address.getCity();
             Log.i(TAG, address.getBuilding().toString());
-            if (!userChooseLocation){
+            if (!userChooseLocation) {
                 //如果不是用户自己选择了地点，那么就自动定位
                 addressStr = address.getFormatAddress();
                 locationText.setText(addressStr);
@@ -181,7 +199,7 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements GetCityIn
             }
         }
     }
-    
+
     //返回了搜索结果
     @Override
     public void onGeocodeSearched(GeocodeResult geocodeResult, int i) {
@@ -209,10 +227,56 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements GetCityIn
         ToastUtil.shortToast(msg);
     }
 
+    private int nowIndex = 0;
+
+    @TargetApi(Build.VERSION_CODES.M)
     @Override
     public void getCityInfo(CityInfo cityInfo) {
         //得到当前城市的数据后进行排布
         Log.i(TAG, cityInfo.toString());
+        //得到城市的类型以后进行类型的设置
+        CityInfo.ServicesBean servicesBean = cityInfo.getServices();
+        addTypeViews(servicesBean.get_$14().getName(), 0);
+        addTypeViews(servicesBean.get_$13().getName(), 1);
+        addTypeViews(servicesBean.get_$11().getName(), 2);
+        addTypeViews(servicesBean.get_$7().getName(), 3);
+        addTypeViews(servicesBean.get_$8().getName(), 4);
+        typeLinear.invalidate();
+        //默认第一个为选择类型
+        TextView tv = ((TextView) typeLinear.getChildAt(0));
+        tv.setTextColor(getColor(R.color.colorAccent));
+        tv.setTextSize(18);
+
+    }
+
+    @TargetApi(Build.VERSION_CODES.M)
+    private void changToType(int fromIndex, int toIndex) {
+        TextView fromTv = (TextView) typeLinear.getChildAt(fromIndex);
+        fromTv.setTextSize(15);
+        TextView toTv = (TextView) typeLinear.getChildAt(toIndex);
+        toTv.setTextSize(18);
+        fromTv.setTextColor(getColor(R.color.secondary_text));
+        toTv.setTextColor(getColor(R.color.colorAccent));
+    }
+
+    @TargetApi(Build.VERSION_CODES.M)
+    private void addTypeViews(String type, int index) {
+        TextView tv = new TextView(this);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT, 1);
+        tv.setGravity(Gravity.CENTER);
+        tv.setLayoutParams(lp);
+        tv.setText(type);
+        tv.setTextSize(15);
+        tv.setTextColor(getResources().getColor(R.color.secondary_text, null));
+        tv.setTag(index);
+        typeLinear.addView(tv);
+        tv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                changToType(nowIndex, (Integer) view.getTag());
+                nowIndex = (int) view.getTag();
+            }
+        });
     }
 
     /*********************************************************************************************/
@@ -250,11 +314,11 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements GetCityIn
         switch (view.getId()) {
             case R.id.location_view:
                 //跳转到定位选择
-                Intent intent = new Intent(this,LocationChooseActivity.class);
-                intent.putExtra(Constant.CURRENT_CITY,nowCity);
-                intent.putExtra(Constant.CURRENT_LOCATION,addressStr);
-                intent.putExtra(Constant.TYPE,Constant.TYPE_START);
-                intent.putExtra(Constant.SERVICE_ID,7);
+                Intent intent = new Intent(this, LocationChooseActivity.class);
+                intent.putExtra(Constant.CURRENT_CITY, nowCity);
+                intent.putExtra(Constant.CURRENT_LOCATION, addressStr);
+                intent.putExtra(Constant.TYPE, Constant.TYPE_START);
+                intent.putExtra(Constant.SERVICE_ID, 7);
                 startActivity(intent);
                 break;
             case R.id.go_to_view:
