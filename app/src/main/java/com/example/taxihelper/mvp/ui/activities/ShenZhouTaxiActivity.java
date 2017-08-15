@@ -2,6 +2,7 @@ package com.example.taxihelper.mvp.ui.activities;
 
 import android.annotation.TargetApi;
 import android.content.Intent;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Build;
@@ -18,7 +19,12 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.amap.api.maps.AMap;
+import com.amap.api.maps.CameraUpdateFactory;
 import com.amap.api.maps.MapView;
+import com.amap.api.maps.model.BitmapDescriptor;
+import com.amap.api.maps.model.BitmapDescriptorFactory;
+import com.amap.api.maps.model.LatLng;
+import com.amap.api.maps.model.MarkerOptions;
 import com.amap.api.maps.model.MyLocationStyle;
 import com.amap.api.services.core.LatLonPoint;
 import com.amap.api.services.geocoder.GeocodeResult;
@@ -49,6 +55,8 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
 import rx.functions.Action1;
+
+import static com.amap.api.maps.model.BitmapDescriptorFactory.HUE_RED;
 
 /**
  * Created by 张兴锐 on 2017/8/8.
@@ -123,7 +131,10 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements GetCityIn
                 });
     }
 
+    private float nowZoom = 18f;
+    AMap aMap = null;
 
+    @TargetApi(Build.VERSION_CODES.M)
     public void initViews() {
         //首先获取当前城市位置
         //        mPresenter.getCityInfo(AccessTokenUtils.getAccessToken(),slat,slot);
@@ -132,22 +143,33 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements GetCityIn
         mToolBar.setTitle("TaxiHelper");
         mToolBar.setTitleTextColor(Color.WHITE);
         //初始化地图控制器对象
-        AMap aMap = null;
         if (aMap == null) {
             aMap = mMapView.getMap();
         }
+
+
         //定义定位方式
         myLocationStyle = new MyLocationStyle();//初始化定位蓝点样式类myLocationStyle.myLocationType(MyLocationStyle.LOCATION_TYPE_LOCATION_ROTATE);//连续定位、且将视角移动到地图中心点，定位点依照设备方向旋转，并且会跟随设备移动。（1秒1次定位）如果不设置myLocationType，默认也会执行此种模式。
         myLocationStyle.interval(2000); //设置连续定位模式下的定位间隔，只在连续定位模式下生效，单次定位模式下不会生效。单位为毫秒。
-        myLocationStyle.myLocationType(MyLocationStyle.LOCATION_TYPE_LOCATION_ROTATE);//连续定位、且将视角移动到地图中心点，定位点依照设备方向旋转，并且会跟随设备移动。（1秒1次定位）默认执行此种模式。
+        myLocationStyle.myLocationType(MyLocationStyle.LOCATION_TYPE_LOCATE);//连续定位、且将视角移动到地图中心点，定位点依照设备方向旋转，并且会跟随设备移动。（1秒1次定位）默认执行此种模式。
         //自定义定位图标
         ///////////////////////////////////
+        myLocationStyle.strokeColor(getColor(R.color.touming));
+        myLocationStyle.radiusFillColor(getColor(R.color.touming));
+        myLocationStyle.strokeWidth(0);
+        BitmapDescriptor bm = BitmapDescriptorFactory.defaultMarker(HUE_RED);
+        myLocationStyle.myLocationIcon(bm);
+        aMap.getUiSettings().setMyLocationButtonEnabled(false);
+        aMap.getUiSettings().setZoomControlsEnabled(false);
+        aMap.getUiSettings().setZoomGesturesEnabled(true);
+     
 
-
-        aMap.getUiSettings().setMyLocationButtonEnabled(true);//设置默认定位按钮是否显示，非必需设置
+        //设置默认定位按钮是否显示，非必需设置
         aMap.setMyLocationStyle(myLocationStyle);//设置定位蓝点的Style
         aMap.setMyLocationEnabled(true);// 设置为true表示启动显示定位蓝点，false表示隐藏定位蓝点并不进行定位，默认是false。
         aMap.setOnMyLocationChangeListener(this);
+        //设置当前定位级别
+        aMap.moveCamera(CameraUpdateFactory.zoomTo(nowZoom));
 
         //搜索功能初始化
         geocodeSearch = new GeocodeSearch(this);
@@ -168,6 +190,17 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements GetCityIn
         double lat = location.getLatitude();
         double lot = location.getLongitude();
         LatLonPoint latLonPoint = new LatLonPoint(lat, lot);
+        //添加一个marker
+        LatLng latLng = new LatLng(lat, lot);
+        myLatLng = latLng;
+        MarkerOptions markerOption = new MarkerOptions();
+        markerOption.position(latLng);
+        markerOption.draggable(false);//设置Marker可拖动
+        markerOption.icon(BitmapDescriptorFactory.fromBitmap(BitmapFactory
+                .decodeResource(getResources(), R.drawable.now_location_icon)));
+        // 将Marker设置为贴地显示，可以双指下拉地图查看效果
+        markerOption.setFlat(false);//设置marker平贴地图效果
+        aMap.addMarker(markerOption);
         //发起逆地址解析请求
         RegeocodeQuery query = new RegeocodeQuery(latLonPoint, 200, GeocodeSearch.AMAP);
         geocodeSearch.getFromLocationAsyn(query);
@@ -308,8 +341,9 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements GetCityIn
         mMapView.onSaveInstanceState(outState);
     }
 
+    LatLng myLatLng;
 
-    @OnClick({R.id.location_view, R.id.go_to_view})
+    @OnClick({R.id.location_view, R.id.go_to_view, R.id.location})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.location_view:
@@ -322,6 +356,11 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements GetCityIn
                 startActivity(intent);
                 break;
             case R.id.go_to_view:
+                break;
+            case R.id.location:
+                if (myLatLng != null) {
+                    aMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myLatLng, nowZoom));
+                }
                 break;
         }
     }

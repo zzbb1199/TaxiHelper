@@ -3,6 +3,7 @@
     <color name="colorPrimary">#DB4C3F</color>
     <color name="colorPrimaryDark">#C33433</color>
     <color name="colorAccent">#DB4C2F</color>
+    <color name="touming">#00000000</color>
     
     
     <color name="primary_text">#212121</color>
