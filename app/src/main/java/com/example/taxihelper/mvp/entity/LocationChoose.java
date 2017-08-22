@@ -6,6 +6,31 @@ package com.example.taxihelper.mvp.entity;
 
 public class LocationChoose {
     private String locatoin;
+    public String type;
+    private String formatLocation;
+
+    public LocationChoose(String locatoin, String type, String formatLocation) {
+        this.locatoin = locatoin;
+        this.type = type;
+        this.formatLocation = formatLocation;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getFormatLocation() {
+        return formatLocation;
+    }
+
+    public void setFormatLocation(String formatLocation) {
+        this.formatLocation = formatLocation;
+    }
+    
 
     public LocationChoose(String locatoin) {
         this.locatoin = locatoin;

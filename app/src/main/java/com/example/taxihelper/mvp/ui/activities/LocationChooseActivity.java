@@ -75,9 +75,15 @@ public class LocationChooseActivity extends RxBusSubscriberBaseActivity implemen
         listView.setAdapter(adapter);
         adapter.setOnItemClickListener(this);
         //初始化搜索
-        query = new InputtipsQuery(currentLocation, currentCity);
-        query.setCityLimit(true);//限制在当前城市
-
+        if (type == Constant.TYPE_START){
+            getSupportActionBar().setTitle("选择上车地点");
+            query = new InputtipsQuery(currentLocation, currentCity);
+            query.setCityLimit(true);//限制在当前城市
+        }else {
+            getSupportActionBar().setTitle("选择下车地点");
+            query = new InputtipsQuery(currentCity,currentCity);
+        }
+        
         inputTips = new Inputtips(this, query);
         inputTips.setInputtipsListener(this);
         inputTips.requestInputtipsAsyn();
@@ -147,8 +153,9 @@ public class LocationChooseActivity extends RxBusSubscriberBaseActivity implemen
 
     @Override
     public void onItemClick(int position) {
-        String choose = adapter.getItem(position).getName();
-        RxBus.getDefault().post(new LocationChoose(choose));
+        String location = adapter.getItem(position).getName();
+        String formatLocation = adapter.getItem(position).getDistrict()+adapter.getItem(position).getName();
+        RxBus.getDefault().post(new LocationChoose(location,type,formatLocation));
         finish();
     }
 }

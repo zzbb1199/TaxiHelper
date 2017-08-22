@@ -9,7 +9,7 @@ public class ResponseCons {
     public static final String BASE_URL = "";
     public static final String IMAGE_URL = "";
 
-    public static final int STATUS_SUCCESS = 200;
+    public static final int STATUS_SUCCESS = 1;
     public static final String SUCCESS_MSG = "成功";
 
     public static final int STATUS_FILED = 500;

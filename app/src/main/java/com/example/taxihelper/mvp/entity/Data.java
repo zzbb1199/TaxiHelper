@@ -7,14 +7,15 @@ package com.example.taxihelper.mvp.entity;
 public class Data<T> {
 
 
-
     private String busiCode;
     private int code;
     private T content;
+    private String handler;
     private String msg;
     private String status;
     private String uid;
     private String version;
+
 
     public String getBusiCode() {
         return busiCode;
@@ -38,6 +39,14 @@ public class Data<T> {
 
     public void setContent(T content) {
         this.content = content;
+    }
+
+    public String getHandler() {
+        return handler;
+    }
+
+    public void setHandler(String handler) {
+        this.handler = handler;
     }
 
     public String getMsg() {
@@ -71,5 +80,5 @@ public class Data<T> {
     public void setVersion(String version) {
         this.version = version;
     }
-    
+
 }

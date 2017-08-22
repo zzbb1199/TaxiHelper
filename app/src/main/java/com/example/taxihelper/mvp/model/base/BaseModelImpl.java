@@ -9,6 +9,7 @@ import com.example.taxihelper.constant.Constant;
 import com.example.taxihelper.mvp.entity.Data;
 import com.example.taxihelper.net.Api;
 import com.example.taxihelper.net.ApiException;
+import com.example.taxihelper.utils.others.AccessTokenUtils;
 
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
@@ -25,6 +26,7 @@ public class BaseModelImpl {
             .build();
     private Retrofit mRetrofit1;
     private Retrofit mRetrofit2;
+    protected String accessToken;
 
     public BaseModelImpl() {
         mRetrofit1 = new Retrofit.Builder()
@@ -39,6 +41,7 @@ public class BaseModelImpl {
                 .addConverterFactory(GsonConverterFactory.create())
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .build();
+        accessToken = AccessTokenUtils.getAccessToken();
     }
     
     protected Api getAuthApi(){
