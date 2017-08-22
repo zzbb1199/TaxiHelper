@@ -55,7 +55,7 @@ import com.example.taxihelper.mvp.presenter.TaxiPresenterImpl;
 import com.example.taxihelper.mvp.ui.adapters.TaxiResultInfoViewPager;
 import com.example.taxihelper.mvp.ui.fragments.TaxiKindsFragment;
 import com.example.taxihelper.utils.image.DialogProgressUtils;
-import com.example.taxihelper.utils.others.ToastUtil;
+import com.example.taxihelper.utils.image.ToastUtil;
 import com.example.taxihelper.utils.system.ActivityStack;
 import com.example.taxihelper.utils.system.RxBus;
 import com.example.taxihelper.widget.CircleView;
@@ -103,6 +103,16 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
     ViewPager viewPager;
     @InjectView(R.id.taxi_result_info)
     CardView taxiResultInfo;
+    @InjectView(R.id.card_view)
+    CardView cardView;
+    @InjectView(R.id.location_view)
+    LinearLayout locationView;
+    @InjectView(R.id.go_to_view)
+    LinearLayout goToView;
+    @InjectView(R.id.confirm_taxi)
+    Button confirmTaxi;
+    @InjectView(R.id.main_container)
+    LinearLayout mainContainer;
 
 
     /**
@@ -361,7 +371,7 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
 
     @Override
     public void showCreateOrderResult(CreateOrder createOrder) {
-        Log.i(TAG,createOrder.toString());
+        Log.i(TAG, createOrder.toString());
     }
 
     @TargetApi(Build.VERSION_CODES.M)
@@ -452,19 +462,26 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
                 break;
             case R.id.taxi_right_now:
                 //一旦叫车，不可输入
+                setInputClickAble(false);
                 presenter.getTaxiPrice(slat, slot, elat, elot, choosedServiceId, startCityId, null, null, null, null, null);
                 break;
             case R.id.confirm_taxi:
                 taxiResultInfo.setVisibility(View.INVISIBLE);
                 //进行叫车，判断是什么车的类型
-                int pos =  viewPager.getCurrentItem();
-                int carGroupId = ((TaxiKindsFragment)adapter.getItem(pos)).getCargroupid();
+                int pos = viewPager.getCurrentItem();
+                int carGroupId = ((TaxiKindsFragment) adapter.getItem(pos)).getCargroupid();
                 String startName = locationText.getText().toString().trim();
                 String endName = goToText.getText().toString().trim();
-                presenter.createOrder(choosedServiceId,carGroupId,passengerMobile,passengerName,slat,slot
-                        ,startName,startName,endName,endName,elat,elot,estimateId);
+                presenter.createOrder(choosedServiceId, carGroupId, passengerMobile, passengerName, slat, slot
+                        , startName, startName, endName, endName, elat, elot, estimateId);
                 break;
         }
+    }
+
+    private void setInputClickAble(boolean clickAble) {
+        cardView.setClickable(clickAble);
+        locationView.setClickable(clickAble);
+        goToView.setClickable(clickAble);
     }
 
 
@@ -508,8 +525,8 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
         //加入车辆
         taxiResultInfo.setVisibility(View.VISIBLE);
         estimateId = taxiPriceInfo.getEstimateid();
-        distanceTv.setText("预估距离:"+df.format(taxiPriceInfo.getDistance() / 1000) + "km");
-        timeCostTv.setText("预计耗时:"+taxiPriceInfo.getDuration() + "min");
+        distanceTv.setText("预估距离:" + df.format(taxiPriceInfo.getDistance() / 1000) + "km");
+        timeCostTv.setText("预计耗时:" + taxiPriceInfo.getDuration() + "min");
         List<Fragment> fragments = new ArrayList<>();
 
         //初始化Fragment
@@ -518,7 +535,7 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
             Bundle bundle = new Bundle();
             bundle.putString(Constant.CAR_TYPE, prices.getName());
             bundle.putFloat(Constant.CAR_PRICES, prices.getPrice());
-            bundle.putInt(Constant.CAR_GROUP_ID,prices.getCargroupid());
+            bundle.putInt(Constant.CAR_GROUP_ID, prices.getCargroupid());
             fragment.setArguments(bundle);
             fragments.add(fragment);
         }

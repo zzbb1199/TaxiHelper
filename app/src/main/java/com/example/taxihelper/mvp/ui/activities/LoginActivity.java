@@ -11,7 +11,7 @@ import com.example.taxihelper.mvp.entity.GainAccessToken;
 import com.example.taxihelper.mvp.presenter.GainAccessTokenPresenterImpl;
 import com.example.taxihelper.mvp.ui.activities.base.RxBusSubscriberBaseActivity;
 import com.example.taxihelper.utils.others.AccessTokenUtils;
-import com.example.taxihelper.utils.others.ToastUtil;
+import com.example.taxihelper.utils.image.ToastUtil;
 import com.example.taxihelper.utils.system.RxBus;
 import com.example.taxihelper.utils.system.SpUtil;
 import com.example.taxihelper.utils.system.ToActivityUtil;

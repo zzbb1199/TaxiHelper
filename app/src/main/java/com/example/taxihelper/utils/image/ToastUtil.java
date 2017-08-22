@@ -1,4 +1,4 @@
-package com.example.taxihelper.utils.others;
+package com.example.taxihelper.utils.image;
 
 import android.widget.Toast;
 

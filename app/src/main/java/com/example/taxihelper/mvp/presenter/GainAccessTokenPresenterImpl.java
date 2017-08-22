@@ -6,7 +6,7 @@ import com.example.taxihelper.mvp.contract.GainAccessTokenContract;
 import com.example.taxihelper.mvp.entity.GainAccessToken;
 import com.example.taxihelper.mvp.model.GainAccessTokenModelImpl;
 import com.example.taxihelper.mvp.presenter.base.BasePresenterImpl;
-import com.example.taxihelper.utils.others.ToastUtil;
+import com.example.taxihelper.utils.image.ToastUtil;
 
 import javax.inject.Inject;
 

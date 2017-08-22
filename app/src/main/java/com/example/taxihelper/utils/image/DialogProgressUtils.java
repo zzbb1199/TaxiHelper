@@ -1,6 +1,6 @@
 package com.example.taxihelper.utils.image;
 
-import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 
 /**
@@ -9,14 +9,16 @@ import android.content.Context;
 
 public class DialogProgressUtils {
 
-    private static AlertDialog dialog;
+    private static ProgressDialog dialog;
 
     public static void ShowDialogProgress(Context context) {
-        dialog = new AlertDialog.Builder(context)
-                .setTitle("提示:")
-                .setMessage("正在加载请稍后...")
-                .create();
+        if (dialog == null) {
+            dialog = new ProgressDialog(context);
+            dialog.setMessage("加载中...");
+        }
+        dialog.show();
     }
+
 
     public static void hideDialogProgress() {
         dialog.dismiss();
