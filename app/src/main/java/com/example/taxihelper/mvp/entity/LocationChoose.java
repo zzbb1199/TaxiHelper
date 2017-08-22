@@ -8,12 +8,23 @@ public class LocationChoose {
     private String locatoin;
     public String type;
     private String formatLocation;
+    private int cityId;
 
-    public LocationChoose(String locatoin, String type, String formatLocation) {
+    public LocationChoose(String locatoin, String type, String formatLocation, int cityId) {
         this.locatoin = locatoin;
         this.type = type;
         this.formatLocation = formatLocation;
+        this.cityId = cityId;
     }
+
+    public int getCityId() {
+        return cityId;
+    }
+
+    public void setCityId(int cityId) {
+        this.cityId = cityId;
+    }
+    
 
     public String getType() {
         return type;

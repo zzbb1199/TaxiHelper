@@ -8,6 +8,7 @@ import com.example.taxihelper.R;
 import com.example.taxihelper.constant.Constant;
 import com.example.taxihelper.mvp.contract.GetCitiesInfoContract;
 import com.example.taxihelper.mvp.entity.CitiesInfo;
+import com.example.taxihelper.mvp.entity.CityChoose;
 import com.example.taxihelper.mvp.presenter.GetCitiesInfoPresenterImpl;
 import com.example.taxihelper.mvp.ui.activities.base.BaseActivity;
 import com.example.taxihelper.mvp.ui.adapters.CityChooseContentAdapter;
@@ -17,9 +18,11 @@ import com.example.taxihelper.utils.others.AccessTokenUtils;
 import com.example.taxihelper.utils.others.EasyRecyViewInitUtils;
 import com.example.taxihelper.utils.others.ToastUtil;
 import com.example.taxihelper.utils.system.DensityUtil;
+import com.example.taxihelper.utils.system.RxBus;
 import com.example.taxihelper.widget.DividerDecoration;
 import com.example.taxihelper.widget.StickyHeaderDecoration;
 import com.jude.easyrecyclerview.EasyRecyclerView;
+import com.jude.easyrecyclerview.adapter.RecyclerArrayAdapter;
 
 import java.util.List;
 
@@ -31,7 +34,7 @@ import butterknife.InjectView;
  * Created by 张兴锐 on 2017/8/11.
  */
 
-public class CityChooseActivity extends BaseActivity implements GetCitiesInfoContract.View {
+public class CityChooseActivity extends BaseActivity implements GetCitiesInfoContract.View, RecyclerArrayAdapter.OnItemClickListener {
     @InjectView(R.id.current_city)
     TextView currentCityTv;
     @InjectView(R.id.citys)
@@ -41,6 +44,8 @@ public class CityChooseActivity extends BaseActivity implements GetCitiesInfoCon
     
     @Inject
     GetCitiesInfoPresenterImpl mPresenter;
+
+
     @Override
     public void initInjector() {
         mActivityComponent.inject(this);
@@ -66,7 +71,7 @@ public class CityChooseActivity extends BaseActivity implements GetCitiesInfoCon
         adapter = new CityChooseContentAdapter(this);
 //        citysRecycler.addItemDecoration(itemDecoration);
         citysRecycler.setAdapter(adapter);
-        
+        adapter.setOnItemClickListener(this);
         //加入header
         StickyHeaderDecoration header = new StickyHeaderDecoration(new CityChooseHeaderAdapter(this,adapter));
         header.setIncludeHeader(true);
@@ -102,5 +107,11 @@ public class CityChooseActivity extends BaseActivity implements GetCitiesInfoCon
     @Override
     public void getDatas(List<CitiesInfo> list) {
         adapter.addAll(list);
+    }
+
+    @Override
+    public void onItemClick(int position) {
+        RxBus.getDefault().post(new CityChoose(adapter.getItem(position).getCityName(),adapter.getItem(position).getCityId()));
+        finish();
     }
 }

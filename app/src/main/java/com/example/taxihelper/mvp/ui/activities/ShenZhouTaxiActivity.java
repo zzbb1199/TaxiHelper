@@ -121,6 +121,7 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
     private String passengerName = "张兴锐";
     private String passengerMobile = "15086943358";
     private int carGroupId;
+    private int startCityId;
     TaxiResultInfoViewPager adapter;
     /**
      * presenter
@@ -134,7 +135,6 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
     MyLocationStyle myLocationStyle;
     GeocodeSearch geocodeSearch;
     MapView mMapView = null;
-    private int cityId;
 
     public void initInjector() {
         mActivityComponent.inject(this);
@@ -173,6 +173,7 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
                     public void call(LocationChoose locationChoose) {
                         if (locationChoose.type.equals(Constant.TYPE_START)) {
                             userChooseLocation = true;
+                            startCityId = locationChoose.getCityId();
                             locationText.setText(locationChoose.getLocatoin());
                             //解析经纬度
                             // name表示地址，第二个参数表示查询城市，中文或者中文全拼，citycode、adcode  
@@ -342,7 +343,7 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
         //得到当前城市的数据后进行排布
         Log.i(TAG, cityInfo.toString());
         //捕捉城市id
-        cityId = cityInfo.getCityId();
+        startCityId = cityInfo.getCityId();
         //得到城市的类型以后进行类型的设置
         CityInfo.ServicesBean servicesBean = cityInfo.getServices();
         addTypeViews(servicesBean.get_$14().getName(), 0);
@@ -451,7 +452,7 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
                 break;
             case R.id.taxi_right_now:
                 //一旦叫车，不可输入
-                presenter.getTaxiPrice(slat, slot, elat, elot, choosedServiceId, cityId, null, null, null, null, null);
+                presenter.getTaxiPrice(slat, slot, elat, elot, choosedServiceId, startCityId, null, null, null, null, null);
                 break;
             case R.id.confirm_taxi:
                 taxiResultInfo.setVisibility(View.INVISIBLE);

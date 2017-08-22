@@ -39,6 +39,10 @@ public class LocationChooseActivity extends RxBusSubscriberBaseActivity implemen
     EditText locationInput;
     @InjectView(R.id.search_result_list)
     EasyRecyclerView listView;
+    private int currentCityId;
+    private boolean hasSearch = false;
+    String type;
+    Integer serviceId;
     private String currentCity;
     private String currentLocation;
     private LocationChooseAdapter adapter;
@@ -49,8 +53,6 @@ public class LocationChooseActivity extends RxBusSubscriberBaseActivity implemen
     InputtipsQuery query;
     Inputtips inputTips;
 
-    String type;
-    Integer serviceId;
     @Override
     public void initInjector() {
 
@@ -102,6 +104,8 @@ public class LocationChooseActivity extends RxBusSubscriberBaseActivity implemen
         intent.putExtra(Constant.TYPE,type);
         intent.putExtra(Constant.SERVICE_ID,serviceId);
         startActivity(intent);
+        //用户更改城市，为了重新搜索
+        hasSearch = false;
     }
 
     @Override
@@ -110,8 +114,16 @@ public class LocationChooseActivity extends RxBusSubscriberBaseActivity implemen
                 .subscribe(new Action1<CityChoose>() {
                     @Override
                     public void call(CityChoose cityChoose) {
+                        currentCityId = cityChoose.getCityId();
                         currentCity = cityChoose.getCity();
                         cityChooseTv.setText(currentCity);
+                        //用户改变了城市选择，这里重新请求
+                        if (!hasSearch){
+                            query = new InputtipsQuery(currentCity, currentCity);
+                            inputTips.setQuery(query);
+                            inputTips.requestInputtipsAsyn();
+                            hasSearch = true;
+                        }
                     }
                 });
 
@@ -155,7 +167,7 @@ public class LocationChooseActivity extends RxBusSubscriberBaseActivity implemen
     public void onItemClick(int position) {
         String location = adapter.getItem(position).getName();
         String formatLocation = adapter.getItem(position).getDistrict()+adapter.getItem(position).getName();
-        RxBus.getDefault().post(new LocationChoose(location,type,formatLocation));
+        RxBus.getDefault().post(new LocationChoose(location,type,formatLocation,currentCityId));
         finish();
     }
 }
