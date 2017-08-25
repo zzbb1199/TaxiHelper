@@ -183,13 +183,13 @@ public class DrivingRouteOverlay extends RouteOverlay{
     	if (status.equals("畅通")) {
     		return Color.parseColor("#66bb6a");//绿色
 		} else if (status.equals("缓行")) {
-			 return Color.parseColor("#ffeb3b");//黄色
+			 return Color.parseColor("#ffee58");//黄色
 		} else if (status.equals("拥堵")) {
-			return Color.parseColor("#f44336");//红色
+			return Color.parseColor("#ef5350");//红色
 		} else if (status.equals("严重拥堵")) {
-			return Color.parseColor("#d32f2f");//深红色
+			return Color.parseColor("#7e57c2");//深红色
 		} else {
-			return Color.parseColor("#537edc");
+			return Color.parseColor("#66bb6a");
 		}	
 	}
 

@@ -105,8 +105,6 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
     LinearLayout typeLinear;
     @InjectView(R.id.map)
     MapView map;
-    @InjectView(R.id.taxi_right_now)
-    Button taxiRightNow;
     AMap aMap = null;
     @InjectView(R.id.distance)
     TextView distanceTv;
@@ -221,7 +219,6 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
                         } else {
                             isChooseEnd = true;
                             goToText.setText(locationChoose.getLocatoin());
-//                            taxiRightNow.setVisibility(View.VISIBLE);
                             GeocodeQuery query = new GeocodeQuery(locationChoose.getFormatLocation(), nowCity);
                             geocodeSearch.getFromLocationNameAsyn(query);
                         }
@@ -282,7 +279,6 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
         aMap.getUiSettings().setTiltGesturesEnabled(false);//禁止倾斜手势
         aMap.setOnMyLocationChangeListener(this);
         //设置当前定位级别
-        aMap.setMinZoomLevel(10f);
         aMap.moveCamera(CameraUpdateFactory.zoomTo(nowZoom));
         aMap.setOnCameraChangeListener(this);// 对amap添加移动地图事件监听器
         //搜索功能初始化
@@ -299,7 +295,6 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
      *
      * @param location
      */
-    private boolean hasRequestType = false;//避免多次请求城市可用服务类
     private boolean isFirstLocationChanged = false;
 
     @Override
@@ -556,7 +551,7 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
     }
 
 
-    @OnClick({R.id.location_view, R.id.go_to_view, R.id.location, R.id.taxi_right_now, R.id.confirm_taxi})
+    @OnClick({R.id.location_view, R.id.go_to_view, R.id.location, R.id.confirm_taxi})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.location_view:
@@ -580,11 +575,6 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
                 if (myLatLng != null) {
                     aMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myLatLng, nowZoom));
                 }
-                break;
-            case R.id.taxi_right_now:
-                //一旦叫车，不可输入
-                //                setInputClickAble(false);
-                presenter.getTaxiPrice(slat, slot, elat, elot, choosedServiceId, startCityId, null, null, null, null, null);
                 break;
             case R.id.confirm_taxi:
                 taxiResultInfo.setVisibility(View.INVISIBLE);
@@ -641,8 +631,6 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
     @Override
     public void showPriceResult(TaxiPriceInfo taxiPriceInfo) {
         Log.i(TAG, taxiPriceInfo.toString());
-        //叫车成功，消失
-        taxiRightNow.setVisibility(View.INVISIBLE);
         //加入车辆
         taxiResultInfo.setVisibility(View.VISIBLE);
         estimateId = taxiPriceInfo.getEstimateid();
@@ -688,7 +676,7 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
         }
 
         if (isFirstRecocd) {
-            //            aMap.clear();//清除原点定位
+            //aMap.clear();//清除原点定位
             setOriginLocationMarker();
             isFirstRecocd = false;
         }
