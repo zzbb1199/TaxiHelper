@@ -21,13 +21,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import com.amap.api.maps.AMap;
@@ -37,7 +36,6 @@ import com.amap.api.maps.Projection;
 import com.amap.api.maps.model.BitmapDescriptorFactory;
 import com.amap.api.maps.model.CameraPosition;
 import com.amap.api.maps.model.LatLng;
-import com.amap.api.maps.model.LatLngBounds;
 import com.amap.api.maps.model.MarkerOptions;
 import com.amap.api.maps.model.MyLocationStyle;
 import com.amap.api.services.core.LatLonPoint;
@@ -101,8 +99,6 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
     TextView goToText;
     @InjectView(R.id.toolbar)
     Toolbar mToolBar;
-    @InjectView(R.id.type_linear)
-    LinearLayout typeLinear;
     @InjectView(R.id.map)
     MapView map;
     AMap aMap = null;
@@ -126,6 +122,12 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
     AppBarLayout appBarLayout;
     @InjectView(R.id.center_image)
     ImageView centerImage;
+    @InjectView(R.id.type_choose)
+    ImageView typeChoose;
+    @InjectView(R.id.main_container)
+    LinearLayout mainContainer;
+    private LinearLayout typeLinear;
+    private PopupWindow pw;
 
 
     /**
@@ -230,21 +232,6 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
 
     @TargetApi(Build.VERSION_CODES.M)
     public void initViews() {
-        //首先获取当前城市位置
-        //        mPresenter.getCityInfo(AccessTokenUtils.getAccessToken(),slat,slot);
-        final WindowManager wm = this.getWindowManager();
-        //        centerImage.post(new Runnable() {
-        //            @Override
-        //            public void run() {
-        //                Log.i(TAG, wm.getDefaultDisplay().getHeight() + "");
-        //                Log.i(TAG, appBarLayout.getHeight() / 2 + "");
-        ////                screenCenterY = wm.getDefaultDisplay().getHeight() / 3 + appBarLayout.getHeight()/2;
-        ////                screenCenterX = wm.getDefaultDisplay().getWidth() / 2;
-        //                screenCenterX = (centerImage.getLeft()+centerImage.getWidth()/2);
-        //                screenCenterY = (centerImage.getBottom() + centerImage.getHeight() + 150);
-        //
-        //            }
-        //        });
         setSupportActionBar(mToolBar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         mToolBar.setTitle("TaxiHelper");
@@ -285,9 +272,15 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
         geocodeSearch = new GeocodeSearch(this);
         geocodeSearch.setOnGeocodeSearchListener(this);
 
-
         adapter = new TaxiResultInfoViewPager(getSupportFragmentManager());
         viewPager.setAdapter(adapter);
+
+        //初始化poupwindow
+        CardView view = (CardView) LayoutInflater.from(this).inflate(R.layout.poup_window_more_taxi_type, null);
+        typeLinear = (LinearLayout) view.getChildAt(0);
+        pw = new PopupWindow(view, 320, 95 * 5);
+        pw.setOutsideTouchable(true);
+        pw.setFocusable(true);
     }
 
     /**
@@ -456,9 +449,7 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
         typeLinear.invalidate();
         //默认第一个为选择类型
         TextView tv = ((TextView) typeLinear.getChildAt(0));
-        tv.setTextColor(getColor(R.color.colorAccent));
-        tv.setTextSize(18);
-
+        tv.setTextColor(getColor(R.color.primary_text));
     }
 
     @Override
@@ -469,55 +460,35 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
     @TargetApi(Build.VERSION_CODES.M)
     private void changToType(int fromIndex, int toIndex) {
         TextView fromTv = (TextView) typeLinear.getChildAt(fromIndex);
-        fromTv.setTextSize(15);
         TextView toTv = (TextView) typeLinear.getChildAt(toIndex);
-        toTv.setTextSize(18);
         fromTv.setTextColor(getColor(R.color.secondary_text));
-        toTv.setTextColor(getColor(R.color.colorAccent));
+        toTv.setTextColor(getColor(R.color.primary_text));
     }
 
     @TargetApi(Build.VERSION_CODES.M)
     private void addTypeViews(String type, int index) {
-        TextView tv = new TextView(this);
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT, 1);
-        tv.setGravity(Gravity.CENTER);
-        tv.setLayoutParams(lp);
+        final TextView tv = (TextView) LayoutInflater.from(this).inflate(R.layout.poup_window_item, null);
         tv.setText(type);
-        tv.setTextSize(15);
-        tv.setTextColor(getResources().getColor(R.color.secondary_text, null));
         tv.setTag(index);
+        if (index == 4) {
+            tv.setBackground(null);
+        }
+        tv.post(new Runnable() {
+            @Override
+            public void run() {
+                Log.i(TAG, tv.getHeight() + "高");
+                Log.i(TAG, tv.getWidth() + "宽");
+            }
+        });
         typeLinear.addView(tv);
         tv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 changToType(nowIndex, (Integer) view.getTag());
                 nowIndex = (int) view.getTag();
+                pw.dismiss();
             }
         });
-    }
-
-    /**
-     * 调节地图到正好放置查询范围的所有点 * @param centerLatLng 中心点 * @param range 查询范围（米）
-     */
-    private void adjustCamera(LatLng centerLatLng, int range) {
-        //当前缩放级别下的比例尺 
-        //"每像素代表" + scale + "米"
-        float scale = aMap.getScalePerPixel();
-        //代表range（米）的像素数量 
-        int pixel = Math.round(range / scale);
-        //小范围，小缩放级别（比例尺较大），有精度损失 
-        Projection projection = aMap.getProjection();
-        //将地图的中心点，转换为屏幕上的点 
-        Point center = projection.toScreenLocation(centerLatLng);
-        //获取距离中心点为pixel像素的左、右两点（屏幕上的点 
-        Point right = new Point(center.x + pixel, center.y);
-        Point left = new Point(center.x - pixel, center.y);
-
-        //将屏幕上的点转换为地图上的点 
-        LatLng rightLatlng = projection.fromScreenLocation(right);
-        LatLng LeftLatlng = projection.fromScreenLocation(left);
-        //调整可视范围 
-        aMap.moveCamera(CameraUpdateFactory.newLatLngBounds(LatLngBounds.builder().include(rightLatlng).include(LeftLatlng).build(), 10));
     }
 
 
@@ -527,6 +498,9 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
         super.onDestroy();
         //在activity执行onDestroy时执行mMapView.onDestroy()，销毁地图
         mMapView.onDestroy();
+        if (pw != null) {
+            pw = null;//释放引用
+        }
     }
 
     @Override
@@ -551,7 +525,7 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
     }
 
 
-    @OnClick({R.id.location_view, R.id.go_to_view, R.id.location, R.id.confirm_taxi})
+    @OnClick({R.id.location_view, R.id.go_to_view, R.id.location, R.id.confirm_taxi, R.id.type_choose})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.location_view:
@@ -585,6 +559,10 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
                 String endName = goToText.getText().toString().trim();
                 presenter.createOrder(choosedServiceId, carGroupId, passengerMobile, passengerName, slat, slot
                         , startName, startName, endName, endName, elat, elot, estimateId);
+                break;
+            case R.id.type_choose:
+                pw.update();
+                pw.showAsDropDown(typeChoose);
                 break;
         }
     }
@@ -748,7 +726,7 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
     public void onDriveRouteSearched(DriveRouteResult driveRouteResult, int i) {
         DrivingRouteOverlay drivingRouteOverlay = new DrivingRouteOverlay(
                 this, aMap, driveRouteResult.getPaths().get(0),
-                driveRouteResult.getStartPos(), driveRouteResult.getTargetPos(),null);
+                driveRouteResult.getStartPos(), driveRouteResult.getTargetPos(), null);
         aMap.clear();
         drivingRouteOverlay.removeFromMap();
         drivingRouteOverlay.addToMap();
