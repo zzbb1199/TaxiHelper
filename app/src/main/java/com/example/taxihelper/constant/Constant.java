@@ -44,7 +44,7 @@ public class Constant {
     public static final String TYPE = "type";
     public static final String TYPE_START = "start";
     public static final String TYPE_END = "end";
-    
+    public static final String TYPE_CAR = "car";
     public static final String SERVICE_ID = "serviceId";
 
     /**

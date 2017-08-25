@@ -7,6 +7,7 @@ import com.example.taxihelper.mvp.entity.Data;
 import com.example.taxihelper.mvp.entity.GainAccessToken;
 import com.example.taxihelper.mvp.entity.NearbyCarInfo;
 import com.example.taxihelper.mvp.entity.TaxiPriceInfo;
+import com.example.taxihelper.mvp.entity.UserInfo;
 
 import java.util.List;
 
@@ -99,5 +100,11 @@ public interface Api {
                                               @Field("startName") String startName,@Field("startAddress") String startAddress,
                                               @Field("endName") String endName,@Field("endAddress") String endAddress,
                                               @Field("elat") double elat,@Field("elng") double elot,@Field("estimateId") String estimateId);
+
+    /**
+     * 用户信息
+     */
+    @GET("/v1/resource/user/getUserInfo")
+    Observable<Data<UserInfo>> getUserInfo(@Query("access_token")String accessToken);
 }
     

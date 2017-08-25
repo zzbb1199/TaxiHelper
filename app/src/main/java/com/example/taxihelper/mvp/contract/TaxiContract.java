@@ -5,6 +5,7 @@ import com.example.taxihelper.mvp.entity.CityInfo;
 import com.example.taxihelper.mvp.entity.CreateOrder;
 import com.example.taxihelper.mvp.entity.NearbyCarInfo;
 import com.example.taxihelper.mvp.entity.TaxiPriceInfo;
+import com.example.taxihelper.mvp.entity.UserInfo;
 import com.example.taxihelper.mvp.presenter.base.BasePresenter;
 
 import rx.Observable;
@@ -29,6 +30,8 @@ public interface TaxiContract {
                                             String passengerName, double slat,double slot,String startName,
                                             String startAddress,String endName,String endAddress,
                                             double elat,double elot,String estimateId);
+        
+        Observable<UserInfo> getUserInfo();
     }
 
     interface View extends BaseView {
@@ -39,6 +42,8 @@ public interface TaxiContract {
         void getCityInfo(CityInfo cityInfo);
         
         void showCreateOrderResult(CreateOrder createOrder);
+        
+        void showUserInfo(UserInfo userInfo);
     }
 
     interface Presenter extends BasePresenter {
@@ -53,6 +58,8 @@ public interface TaxiContract {
         void  createOrder(Integer serviceId,Integer carGroupId,String passengerMobil,
                           String passengerName, double slat,double slot,String startName,String startAddress,
                           String endName,String endAddress,
-                          double elat,double elot,String estimateId);;
+                          double elat,double elot,String estimateId);
+        
+        void getUserInfo();
     }
 }

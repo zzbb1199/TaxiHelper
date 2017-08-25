@@ -5,6 +5,7 @@ import com.example.taxihelper.mvp.entity.CityInfo;
 import com.example.taxihelper.mvp.entity.CreateOrder;
 import com.example.taxihelper.mvp.entity.NearbyCarInfo;
 import com.example.taxihelper.mvp.entity.TaxiPriceInfo;
+import com.example.taxihelper.mvp.entity.UserInfo;
 import com.example.taxihelper.mvp.model.base.BaseModelImpl;
 
 import javax.inject.Inject;
@@ -48,6 +49,10 @@ public class TaxiModelImpl extends BaseModelImpl implements TaxiContract.Model {
         return filterStatus(getApi().createOrder(accessToken,serviceId,carGroupId,passengerMobil,passengerName,slat,slot,startName,startAddress,endName,endAddress,elat,elot,estimateId));
     }
 
+    @Override
+    public Observable<UserInfo> getUserInfo() {
+        return filterStatus(getApi().getUserInfo(accessToken));
+    }
 
 
 }

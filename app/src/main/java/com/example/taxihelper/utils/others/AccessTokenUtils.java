@@ -9,6 +9,7 @@ import com.example.taxihelper.utils.system.SpUtil;
  */
 
 public class AccessTokenUtils {
+    
     public static String getAccessToken() {
         return SpUtil.getString(App.getContext(), Constant.ACCESS_TOKEN, null);
     }

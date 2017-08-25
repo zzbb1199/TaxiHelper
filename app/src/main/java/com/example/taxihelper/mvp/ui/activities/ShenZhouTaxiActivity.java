@@ -62,6 +62,7 @@ import com.example.taxihelper.mvp.entity.CreateOrder;
 import com.example.taxihelper.mvp.entity.LocationChoose;
 import com.example.taxihelper.mvp.entity.NearbyCarInfo;
 import com.example.taxihelper.mvp.entity.TaxiPriceInfo;
+import com.example.taxihelper.mvp.entity.UserInfo;
 import com.example.taxihelper.mvp.presenter.TaxiPresenterImpl;
 import com.example.taxihelper.mvp.ui.adapters.TaxiResultInfoViewPager;
 import com.example.taxihelper.mvp.ui.fragments.TaxiKindsFragment;
@@ -88,7 +89,7 @@ import rx.functions.Action1;
  * Created by 张兴锐 on 2017/8/8.
  */
 
-public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContract.View, AMap.OnMyLocationChangeListener, GeocodeSearch.OnGeocodeSearchListener, AMap.OnCameraChangeListener, RouteSearch.OnRouteSearchListener {
+public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContract.View, AMap.OnMyLocationChangeListener, GeocodeSearch.OnGeocodeSearchListener, AMap.OnCameraChangeListener, RouteSearch.OnRouteSearchListener, AMap.OnMapLoadedListener {
 
 
     @InjectView(R.id.location_dot)
@@ -140,13 +141,13 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
     private String addressStr;
     boolean userChooseLocation = false;
     private boolean isChooseEnd = false;
+    private boolean hasCallTaxi = false;
     double slat, slot, elat, elot;
     private int choosedServiceId = 14;//默认为立即叫车
     private String estimateId;
     private String passengerName = "张兴锐";
-    private String passengerMobile = "15086943358";
-
-    private int carGroupId;
+    private String passengerMobile = "15086943351";
+    
     private int startCityId;
     private int screenCenterX;
     private int screenCenterY;
@@ -154,6 +155,11 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
     private LatLng centerLocation;//中心定位位置
     private RouteSearch routeSearch;
     TaxiResultInfoViewPager adapter;
+    /**
+     * 测试使用的数据
+     */
+    private double testLocationLat = 39.166798;
+    private double testLocationLot = 117.397561;
     /**
      * presenter
      */
@@ -265,6 +271,7 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
         aMap.getUiSettings().setRotateGesturesEnabled(false);//禁止地图旋转手势
         aMap.getUiSettings().setTiltGesturesEnabled(false);//禁止倾斜手势
         aMap.setOnMyLocationChangeListener(this);
+        aMap.setOnMapLoadedListener(this);
         //设置当前定位级别
         aMap.moveCamera(CameraUpdateFactory.zoomTo(nowZoom));
         aMap.setOnCameraChangeListener(this);// 对amap添加移动地图事件监听器
@@ -281,6 +288,12 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
         pw = new PopupWindow(view, 320, 95 * 5);
         pw.setOutsideTouchable(true);
         pw.setFocusable(true);
+
+        initDatas();
+    }
+
+    private void initDatas() {
+        presenter.getUserInfo();
     }
 
     /**
@@ -288,34 +301,56 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
      *
      * @param location
      */
-    private boolean isFirstLocationChanged = false;
+    private boolean isFirstMapLoad = false;
 
     @Override
     public void onMyLocationChange(Location location) {
         Log.i(TAG, "首次定位");
-        isFirstLocationChanged = true;
+        isFirstMapLoad = true;
         //逆地址解析
         double lat = location.getLatitude();
         double lot = location.getLongitude();
-
-        slat = lat;
-        slot = lot;
-        centerLocation = new LatLng(lat, lot);
+        /**.
+         * 正规
+         */
+        //        slat = lat;
+        //        slot = lot;
+        /**
+         * 测试
+         */
+        slat = testLocationLat;
+        slot = testLocationLot;
+        /**
+         * 下面为正规用法
+         */
+        //        centerLocation = new LatLng(lat, lot);
+        /**
+         * 为进行测试，下面为测试数据
+         */
+        centerLocation = new LatLng(testLocationLat, testLocationLot);
         myLatLng = centerLocation;
 
         if (myLatLng != null) {
             aMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myLatLng, nowZoom));//触发地图层移动，致使定位后续操作
         }
-        //        //发起逆地址解析请求
-        //        LatLonPoint latLonPoint = new LatLonPoint(lat, lot);
-        //        RegeocodeQuery query = new RegeocodeQuery(latLonPoint, 200, GeocodeSearch.AMAP);
-        //        geocodeSearch.getFromLocationAsyn(query);
-        //如果不是用户自己选择城市，以当前定位的地方进行请求城市车辆的服务类型
-        presenter.getCityInfo(lat, lot);
-        presenter.getNearbyCarInfo(lat, lot);
+        /**
+         * 正规写法
+         */
+        //        presenter.getCityInfo(lat, lot);
+        //        presenter.getNearbyCarInfo(lat, lot);
+        /**
+         * 测试数据
+         */
+        presenter.getCityInfo(testLocationLat, testLocationLot);
+        presenter.getNearbyCarInfo(testLocationLat, testLocationLot);
     }
 
-
+    /**
+     * 坐标转文字
+     *
+     * @param regeocodeResult
+     * @param i
+     */
     //逆地址解析回调
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
@@ -336,7 +371,14 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
     }
 
 
-    //返回了搜索结果
+    //返回了搜索结果 
+
+    /**
+     * 文字转坐标
+     *
+     * @param geocodeResult
+     * @param i
+     */
     @Override
     public void onGeocodeSearched(GeocodeResult geocodeResult, int i) {
         if (i == 1000) {
@@ -361,6 +403,7 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
                     //第三部，计算路线
                     calculateDriveRoute();
                     presenter.getTaxiPrice(slat, slot, elat, elot, choosedServiceId, startCityId, null, null, null, null, null);
+                    hasCallTaxi = true;
                 }
             }
 
@@ -376,8 +419,10 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
         Bitmap bitMap;
         if (type == Constant.TYPE_START) {
             bitMap = BitmapFactory.decodeResource(getResources(), R.drawable.go_up_location);
-        } else {
+        } else if (type == Constant.TYPE_END) {
             bitMap = BitmapFactory.decodeResource(getResources(), R.drawable.go_down_location);
+        } else {
+            bitMap = BitmapFactory.decodeResource(getResources(), R.drawable.now_location_icon);
         }
         int width = bitMap.getWidth();
         int height = bitMap.getHeight();
@@ -436,7 +481,6 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
     @Override
     public void getCityInfo(CityInfo cityInfo) {
         //得到当前城市的数据后进行排布
-        Log.i(TAG, cityInfo.toString());
         //捕捉城市id
         startCityId = cityInfo.getCityId();
         //得到城市的类型以后进行类型的设置
@@ -455,6 +499,11 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
     @Override
     public void showCreateOrderResult(CreateOrder createOrder) {
         Log.i(TAG, createOrder.toString());
+    }
+
+    @Override
+    public void showUserInfo(UserInfo userInfo) {
+        Log.i(TAG, userInfo.toString());
     }
 
     @TargetApi(Build.VERSION_CODES.M)
@@ -591,15 +640,7 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
         } else {
             //根据各车的经纬度，在地图上显示
             for (NearbyCarInfo.CarListBean car : nearbyCarInfo.getCarList()) {
-                LatLng latLng = new LatLng(Double.valueOf(car.getLat()), Double.valueOf(car.getLng()));
-                MarkerOptions markerOption = new MarkerOptions();
-                markerOption.position(latLng);
-                markerOption.draggable(false);//设置Marker可拖动
-                markerOption.icon(BitmapDescriptorFactory.fromBitmap(BitmapFactory
-                        .decodeResource(getResources(), R.drawable.now_location_icon)));
-                // 将Marker设置为贴地显示，可以双指下拉地图查看效果
-                markerOption.setFlat(false);//设置marker平贴地图效果
-                aMap.addMarker(markerOption);
+                addMarker(Double.valueOf(car.getLat()), Double.valueOf(car.getLng()), Constant.TYPE_CAR);
             }
         }
     }
@@ -643,21 +684,24 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
      * @param cameraPosition
      */
     boolean isFirstRecocd = true;//记录屏幕中心点的辅助变量
-
     @Override
     public void onCameraChangeFinish(CameraPosition cameraPosition) {
         //获取可视区
         Log.i(TAG, "地图移动层完成");
-        if (!isFirstLocationChanged) {
+        if (!isFirstMapLoad) {
             //因为必须要等首次定位完成，才可以用屏幕点进行定位
             return;
         }
-
+        if (hasCallTaxi) {
+            return;
+        }
+        
         if (isFirstRecocd) {
             //aMap.clear();//清除原点定位
             setOriginLocationMarker();
             isFirstRecocd = false;
         }
+
 
         nowZoom = cameraPosition.zoom;//更新zoom
         //根据屏幕中心点重新进行定位
@@ -668,17 +712,20 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
         if (centerLatLng != null) {
             //查询地点，重新
             //            final Marker marker = aMap.addMarker(new MarkerOptions().position(centerLatLng).title("当前定位点").snippet("DefaultMarker"));
+            slat = centerLatLng.latitude;
+            slot = centerLatLng.longitude;
             LatLonPoint latLonPoint = new LatLonPoint(centerLatLng.latitude, centerLatLng.longitude);
             //解析当前点
             //搜索开始前，清空文本
             locationText.setText("正在加载地址，请稍后...");
             RegeocodeQuery query = new RegeocodeQuery(latLonPoint, 200, GeocodeSearch.AMAP);
             geocodeSearch.getFromLocationAsyn(query);
-        } else {
-
         }
     }
 
+    /**
+     * 设置原始定位点和初始化屏幕中心
+     */
     private void setOriginLocationMarker() {
         //添加一个marker
         MarkerOptions markerOption = new MarkerOptions();
@@ -741,5 +788,10 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
     @Override
     public void onRideRouteSearched(RideRouteResult rideRouteResult, int i) {
 
+    }
+
+    @Override
+    public void onMapLoaded() {
+        isFirstMapLoad = true;
     }
 }
