@@ -69,12 +69,12 @@ import com.example.taxihelper.mvp.ui.adapters.TaxiResultInfoViewPager;
 import com.example.taxihelper.mvp.ui.fragments.TaxiKindsFragment;
 import com.example.taxihelper.utils.image.DialogProgressUtils;
 import com.example.taxihelper.utils.image.ToastUtil;
+import com.example.taxihelper.utils.others.overlay.DrivingRouteOverlay;
 import com.example.taxihelper.utils.system.ActivityStack;
 import com.example.taxihelper.utils.system.DensityUtil;
 import com.example.taxihelper.utils.system.RxBus;
 import com.example.taxihelper.widget.CircleView;
 
-import java.sql.DriverPropertyInfo;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -221,7 +221,7 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
                         } else {
                             isChooseEnd = true;
                             goToText.setText(locationChoose.getLocatoin());
-                            taxiRightNow.setVisibility(View.VISIBLE);
+//                            taxiRightNow.setVisibility(View.VISIBLE);
                             GeocodeQuery query = new GeocodeQuery(locationChoose.getFormatLocation(), nowCity);
                             geocodeSearch.getFromLocationNameAsyn(query);
                         }
@@ -366,27 +366,47 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
                     //适度缩放，连接路线
                     //第一步，清理扫描点
                     centerImage.setVisibility(View.INVISIBLE);
+                    aMap.clear();
                     //第二部，放置marker
-                    addMarker(slat, slot);
-                    addMarker(elat, elat);
+                    addMarker(slat, slot, Constant.TYPE_START);
+                    addMarker(elat, elot, Constant.TYPE_END);
                     //第三部，计算路线
                     calculateDriveRoute();
-                    //第三部，合理缩放，
-                    aMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, nowZoom));//触发地图层移动，致使定位后续操作
+                    presenter.getTaxiPrice(slat, slot, elat, elot, choosedServiceId, startCityId, null, null, null, null, null);
                 }
             }
 
         }
     }
 
-    private void addMarker(double lat, double lot) {
+    private void addMarker(double lat, double lot, String type) {
         MarkerOptions markerOption = new MarkerOptions();
         markerOption.position(new LatLng(lat, lot));
         markerOption.draggable(false);//设置Marker可拖动
-        markerOption.icon(BitmapDescriptorFactory.fromBitmap(BitmapFactory
-                .decodeResource(getResources(), R.drawable.now_location_icon)));
         // 将Marker设置为贴地显示，可以双指下拉地图查看效果
         markerOption.setFlat(false);//设置marker平贴地图效果
+        Bitmap bitMap;
+        if (type == Constant.TYPE_START) {
+            bitMap = BitmapFactory.decodeResource(getResources(), R.drawable.go_up_location);
+        } else {
+            bitMap = BitmapFactory.decodeResource(getResources(), R.drawable.go_down_location);
+        }
+        int width = bitMap.getWidth();
+        int height = bitMap.getHeight();
+        // 设置想要的大小
+        int newWidth = DensityUtil.dip2px(this, 30);
+        int newHeight = newWidth;
+        // 计算缩放比例
+        float scaleWidth = ((float) newWidth) / width;
+        float scaleHeight = ((float) newHeight) / height;
+        // 取得想要缩放的matrix参数
+        Matrix matrix = new Matrix();
+        matrix.postScale(scaleWidth, scaleHeight);
+        // 得到新的图片
+        bitMap = Bitmap.createBitmap(bitMap, 0, 0, width, height, matrix,
+                true);
+        markerOption.icon(BitmapDescriptorFactory.fromBitmap(bitMap));
+        // 将Marker设置为贴地显示，可以双指下拉地图查看效果
         aMap.addMarker(markerOption);
     }
 
@@ -735,17 +755,16 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
 
     }
 
-    
-    
+
     @Override
     public void onDriveRouteSearched(DriveRouteResult driveRouteResult, int i) {
-//        DrivingRouteOverlay drivingRouteOverlay = new DrivingRouteOverlay(
-//                this, aMap, drivePath, result.getStartPos(), result.getTargetPos());
-//        aMap.clear();
-//        drivingRouteOverlay.removeFromMap();
-//        drivingRouteOverlay.addToMap();
-//        drivingRouteOverlay.zoomToSpan();
-        
+        DrivingRouteOverlay drivingRouteOverlay = new DrivingRouteOverlay(
+                this, aMap, driveRouteResult.getPaths().get(0),
+                driveRouteResult.getStartPos(), driveRouteResult.getTargetPos(),null);
+        aMap.clear();
+        drivingRouteOverlay.removeFromMap();
+        drivingRouteOverlay.addToMap();
+        drivingRouteOverlay.zoomToSpan();
     }
 
     @Override
