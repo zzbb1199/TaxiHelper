@@ -4,14 +4,17 @@ import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Point;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
+import android.support.design.widget.AppBarLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -21,7 +24,9 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -29,12 +34,10 @@ import com.amap.api.maps.AMap;
 import com.amap.api.maps.CameraUpdateFactory;
 import com.amap.api.maps.MapView;
 import com.amap.api.maps.Projection;
-import com.amap.api.maps.model.BitmapDescriptor;
 import com.amap.api.maps.model.BitmapDescriptorFactory;
 import com.amap.api.maps.model.CameraPosition;
 import com.amap.api.maps.model.LatLng;
 import com.amap.api.maps.model.LatLngBounds;
-import com.amap.api.maps.model.Marker;
 import com.amap.api.maps.model.MarkerOptions;
 import com.amap.api.maps.model.MyLocationStyle;
 import com.amap.api.services.core.LatLonPoint;
@@ -44,6 +47,11 @@ import com.amap.api.services.geocoder.GeocodeSearch;
 import com.amap.api.services.geocoder.RegeocodeAddress;
 import com.amap.api.services.geocoder.RegeocodeQuery;
 import com.amap.api.services.geocoder.RegeocodeResult;
+import com.amap.api.services.route.BusRouteResult;
+import com.amap.api.services.route.DriveRouteResult;
+import com.amap.api.services.route.RideRouteResult;
+import com.amap.api.services.route.RouteSearch;
+import com.amap.api.services.route.WalkRouteResult;
 import com.example.taxihelper.App;
 import com.example.taxihelper.R;
 import com.example.taxihelper.constant.Constant;
@@ -62,9 +70,11 @@ import com.example.taxihelper.mvp.ui.fragments.TaxiKindsFragment;
 import com.example.taxihelper.utils.image.DialogProgressUtils;
 import com.example.taxihelper.utils.image.ToastUtil;
 import com.example.taxihelper.utils.system.ActivityStack;
+import com.example.taxihelper.utils.system.DensityUtil;
 import com.example.taxihelper.utils.system.RxBus;
 import com.example.taxihelper.widget.CircleView;
 
+import java.sql.DriverPropertyInfo;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -76,13 +86,11 @@ import butterknife.InjectView;
 import butterknife.OnClick;
 import rx.functions.Action1;
 
-import static com.amap.api.maps.model.BitmapDescriptorFactory.HUE_RED;
-
 /**
  * Created by 张兴锐 on 2017/8/8.
  */
 
-public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContract.View, AMap.OnMyLocationChangeListener, GeocodeSearch.OnGeocodeSearchListener, AMap.OnCameraChangeListener {
+public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContract.View, AMap.OnMyLocationChangeListener, GeocodeSearch.OnGeocodeSearchListener, AMap.OnCameraChangeListener, RouteSearch.OnRouteSearchListener {
 
 
     @InjectView(R.id.location_dot)
@@ -116,8 +124,10 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
     LinearLayout goToView;
     @InjectView(R.id.confirm_taxi)
     Button confirmTaxi;
-    @InjectView(R.id.main_container)
-    LinearLayout mainContainer;
+    @InjectView(R.id.app_bar_layout)
+    AppBarLayout appBarLayout;
+    @InjectView(R.id.center_image)
+    ImageView centerImage;
 
 
     /**
@@ -125,7 +135,7 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
      */
     private ActivityComponent mActivityComponent;
     private String TAG = this.getClass().getSimpleName();
-    private float nowZoom = 18f;
+    private float nowZoom = 14f;
     private String nowCity;
     private String addressStr;
     boolean userChooseLocation = false;
@@ -135,10 +145,14 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
     private String estimateId;
     private String passengerName = "张兴锐";
     private String passengerMobile = "15086943358";
+
     private int carGroupId;
     private int startCityId;
-    private final float minEps = 0.00000001f;
-    private Point screenCenterPoint;
+    private int screenCenterX;
+    private int screenCenterY;
+    private LatLng myLatLng;//自动定位的位置
+    private LatLng centerLocation;//中心定位位置
+    private RouteSearch routeSearch;
     TaxiResultInfoViewPager adapter;
     /**
      * presenter
@@ -181,6 +195,14 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
         mMapView.onCreate(savedInstanceState);
         initViews();
         initRxBus();
+        initRouteSearch();
+    }
+
+
+    /*初始化 搜索路线所需的类*/
+    private void initRouteSearch() {
+        routeSearch = new RouteSearch(this);
+        routeSearch.setRouteSearchListener(this);
     }
 
     private void initRxBus() {
@@ -213,6 +235,19 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
     public void initViews() {
         //首先获取当前城市位置
         //        mPresenter.getCityInfo(AccessTokenUtils.getAccessToken(),slat,slot);
+        final WindowManager wm = this.getWindowManager();
+        //        centerImage.post(new Runnable() {
+        //            @Override
+        //            public void run() {
+        //                Log.i(TAG, wm.getDefaultDisplay().getHeight() + "");
+        //                Log.i(TAG, appBarLayout.getHeight() / 2 + "");
+        ////                screenCenterY = wm.getDefaultDisplay().getHeight() / 3 + appBarLayout.getHeight()/2;
+        ////                screenCenterX = wm.getDefaultDisplay().getWidth() / 2;
+        //                screenCenterX = (centerImage.getLeft()+centerImage.getWidth()/2);
+        //                screenCenterY = (centerImage.getBottom() + centerImage.getHeight() + 150);
+        //
+        //            }
+        //        });
         setSupportActionBar(mToolBar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         mToolBar.setTitle("TaxiHelper");
@@ -229,20 +264,25 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
         //自定义定位图标
         ///////////////////////////////////
         myLocationStyle.strokeColor(getColor(R.color.touming));
+        myLocationStyle.showMyLocation(false);
         myLocationStyle.radiusFillColor(getColor(R.color.touming));
         myLocationStyle.strokeWidth(0);
-        BitmapDescriptor bm = BitmapDescriptorFactory.defaultMarker(HUE_RED);
-        myLocationStyle.myLocationIcon(bm);
-        aMap.getUiSettings().setMyLocationButtonEnabled(false);
-        aMap.getUiSettings().setZoomControlsEnabled(false);
-        aMap.getUiSettings().setZoomGesturesEnabled(true);
-
+        myLocationStyle.myLocationIcon(null);
+        //        BitmapDescriptor bm = BitmapDescriptorFactory.defaultMarker(HUE_RED);
+        //        myLocationStyle.myLocationIcon(bm);
 
         //设置默认定位按钮是否显示，非必需设置
         aMap.setMyLocationStyle(myLocationStyle);//设置定位蓝点的Style
         aMap.setMyLocationEnabled(true);// 设置为true表示启动显示定位蓝点，false表示隐藏定位蓝点并不进行定位，默认是false。
+
+        aMap.getUiSettings().setMyLocationButtonEnabled(false);
+        aMap.getUiSettings().setZoomControlsEnabled(false);
+        aMap.getUiSettings().setZoomGesturesEnabled(true);
+        aMap.getUiSettings().setRotateGesturesEnabled(false);//禁止地图旋转手势
+        aMap.getUiSettings().setTiltGesturesEnabled(false);//禁止倾斜手势
         aMap.setOnMyLocationChangeListener(this);
         //设置当前定位级别
+        aMap.setMinZoomLevel(10f);
         aMap.moveCamera(CameraUpdateFactory.zoomTo(nowZoom));
         aMap.setOnCameraChangeListener(this);// 对amap添加移动地图事件监听器
         //搜索功能初始化
@@ -260,26 +300,28 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
      * @param location
      */
     private boolean hasRequestType = false;//避免多次请求城市可用服务类
+    private boolean isFirstLocationChanged = false;
 
     @Override
     public void onMyLocationChange(Location location) {
+        Log.i(TAG, "首次定位");
+        isFirstLocationChanged = true;
         //逆地址解析
         double lat = location.getLatitude();
         double lot = location.getLongitude();
 
         slat = lat;
         slot = lot;
+        centerLocation = new LatLng(lat, lot);
+        myLatLng = centerLocation;
 
-
-        //添加一个marker
-        LatLng latLng = new LatLng(lat, lot);
-        myLatLng = latLng;
-
-
-        //发起逆地址解析请求
-        LatLonPoint latLonPoint = new LatLonPoint(lat, lot);
-        RegeocodeQuery query = new RegeocodeQuery(latLonPoint, 200, GeocodeSearch.AMAP);
-        geocodeSearch.getFromLocationAsyn(query);
+        if (myLatLng != null) {
+            aMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myLatLng, nowZoom));//触发地图层移动，致使定位后续操作
+        }
+        //        //发起逆地址解析请求
+        //        LatLonPoint latLonPoint = new LatLonPoint(lat, lot);
+        //        RegeocodeQuery query = new RegeocodeQuery(latLonPoint, 200, GeocodeSearch.AMAP);
+        //        geocodeSearch.getFromLocationAsyn(query);
         //如果不是用户自己选择城市，以当前定位的地方进行请求城市车辆的服务类型
         presenter.getCityInfo(lat, lot);
         presenter.getNearbyCarInfo(lat, lot);
@@ -311,17 +353,51 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
     public void onGeocodeSearched(GeocodeResult geocodeResult, int i) {
         if (i == 1000) {
             LatLonPoint latLonPoint = geocodeResult.getGeocodeAddressList().get(0).getLatLonPoint();
+            LatLng latLng = new LatLng(latLonPoint.getLatitude(), latLonPoint.getLongitude());
             if (latLonPoint != null) {
                 if (!isChooseEnd) {
                     slat = latLonPoint.getLatitude();
                     slot = latLonPoint.getLongitude();
+                    aMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, nowZoom));
                 } else {
                     elat = latLonPoint.getLatitude();
                     elot = latLonPoint.getLongitude();
+
+                    //适度缩放，连接路线
+                    //第一步，清理扫描点
+                    centerImage.setVisibility(View.INVISIBLE);
+                    //第二部，放置marker
+                    addMarker(slat, slot);
+                    addMarker(elat, elat);
+                    //第三部，计算路线
+                    calculateDriveRoute();
+                    //第三部，合理缩放，
+                    aMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, nowZoom));//触发地图层移动，致使定位后续操作
                 }
             }
 
         }
+    }
+
+    private void addMarker(double lat, double lot) {
+        MarkerOptions markerOption = new MarkerOptions();
+        markerOption.position(new LatLng(lat, lot));
+        markerOption.draggable(false);//设置Marker可拖动
+        markerOption.icon(BitmapDescriptorFactory.fromBitmap(BitmapFactory
+                .decodeResource(getResources(), R.drawable.now_location_icon)));
+        // 将Marker设置为贴地显示，可以双指下拉地图查看效果
+        markerOption.setFlat(false);//设置marker平贴地图效果
+        aMap.addMarker(markerOption);
+    }
+
+    private void calculateDriveRoute() {
+        RouteSearch.FromAndTo fromAndTo = new RouteSearch.FromAndTo(new LatLonPoint(slat, slot),
+                new LatLonPoint(elat, elot));
+        // fromAndTo包含路径规划的起点和终点，drivingMode表示驾车模式
+        // 第三个参数表示途经点（最多支持16个），第四个参数表示避让区域（最多支持32个），第五个参数表示避让道路
+        RouteSearch.DriveRouteQuery driveRouteQuery = new RouteSearch.DriveRouteQuery(
+                fromAndTo, RouteSearch.DRIVING_MULTI_STRATEGY_FASTEST_SHORTEST_AVOID_CONGESTION, null, null, "");
+        routeSearch.calculateDriveRouteAsyn(driveRouteQuery);
     }
 
 
@@ -425,12 +501,6 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
         //将屏幕上的点转换为地图上的点 
         LatLng rightLatlng = projection.fromScreenLocation(right);
         LatLng LeftLatlng = projection.fromScreenLocation(left);
-
-        //        LatLngBounds bounds = LatLngBounds.builder().include(rightLatlng).include(LeftLatlng).build();
-        //bounds.contains();
-
-        //        aMap.getMapScreenMarkers();
-
         //调整可视范围 
         aMap.moveCamera(CameraUpdateFactory.newLatLngBounds(LatLngBounds.builder().include(rightLatlng).include(LeftLatlng).build(), 10));
     }
@@ -465,7 +535,6 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
         mMapView.onSaveInstanceState(outState);
     }
 
-    LatLng myLatLng;
 
     @OnClick({R.id.location_view, R.id.go_to_view, R.id.location, R.id.taxi_right_now, R.id.confirm_taxi})
     public void onViewClicked(View view) {
@@ -575,10 +644,12 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
         adapter.notifyDataSetChanged();
     }
 
+
     @Override
     public void onCameraChange(CameraPosition cameraPosition) {
 
     }
+
 
     /**
      * 地图层移动监听
@@ -590,27 +661,100 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
     @Override
     public void onCameraChangeFinish(CameraPosition cameraPosition) {
         //获取可视区
-        Log.i(TAG, cameraPosition.toString());
+        Log.i(TAG, "地图移动层完成");
+        if (!isFirstLocationChanged) {
+            //因为必须要等首次定位完成，才可以用屏幕点进行定位
+            return;
+        }
+
+        if (isFirstRecocd) {
+            //            aMap.clear();//清除原点定位
+            setOriginLocationMarker();
+            isFirstRecocd = false;
+        }
+
         nowZoom = cameraPosition.zoom;//更新zoom
         //根据屏幕中心点重新进行定位
         Projection projection = aMap.getProjection();
         //根据屏幕中心找到地图中心
         //记录当前定位在屏幕中的哪个位置
-        if (isFirstRecocd) {
-            screenCenterPoint = projection.toScreenLocation(myLatLng);
-            isFirstRecocd = false;
-        }
-        LatLng centerLatLng = projection.fromScreenLocation(screenCenterPoint);
+        LatLng centerLatLng = projection.fromScreenLocation(new Point(screenCenterX, screenCenterY));
         if (centerLatLng != null) {
             //查询地点，重新
-            //如果在最小误差范围内，那么即是没有回到了当前定位点
-            aMap.clear();
-            final Marker marker = aMap.addMarker(new MarkerOptions().position(centerLatLng).title("当前定位点").snippet("DefaultMarker"));
-            //添加marker等等
-
+            //            final Marker marker = aMap.addMarker(new MarkerOptions().position(centerLatLng).title("当前定位点").snippet("DefaultMarker"));
+            LatLonPoint latLonPoint = new LatLonPoint(centerLatLng.latitude, centerLatLng.longitude);
+            //解析当前点
+            //搜索开始前，清空文本
+            locationText.setText("正在加载地址，请稍后...");
+            RegeocodeQuery query = new RegeocodeQuery(latLonPoint, 200, GeocodeSearch.AMAP);
+            geocodeSearch.getFromLocationAsyn(query);
         } else {
 
         }
+    }
+
+    private void setOriginLocationMarker() {
+        //添加一个marker
+        MarkerOptions markerOption = new MarkerOptions();
+        markerOption.position(centerLocation);
+        markerOption.draggable(false);//设置Marker可拖动
+
+        Bitmap bitMap = BitmapFactory.decodeResource(getResources(), R.drawable.auto_location_record_icon);
+        int width = bitMap.getWidth();
+        int height = bitMap.getHeight();
+        // 设置想要的大小
+        int newWidth = DensityUtil.dip2px(this, 20);
+        int newHeight = newWidth;
+        // 计算缩放比例
+        float scaleWidth = ((float) newWidth) / width;
+        float scaleHeight = ((float) newHeight) / height;
+        // 取得想要缩放的matrix参数
+        Matrix matrix = new Matrix();
+        matrix.postScale(scaleWidth, scaleHeight);
+        // 得到新的图片
+        bitMap = Bitmap.createBitmap(bitMap, 0, 0, width, height, matrix,
+                true);
+        markerOption.icon(BitmapDescriptorFactory.fromBitmap(bitMap));
+        // 将Marker设置为贴地显示，可以双指下拉地图查看效果
+        markerOption.setFlat(true);//设置marker平贴地图效果
+        aMap.addMarker(markerOption);
+
+        //初始化screenX,screenY
+        Projection projection = aMap.getProjection();
+        Point centerPoint = projection.toScreenLocation(centerLocation);
+        screenCenterX = centerPoint.x;
+        screenCenterY = centerPoint.y;
+        //为将定位点与扫描点对其，进行误差纠正 ***********核心
+        centerImage.setY(screenCenterY - centerImage.getHeight());
+        centerImage.invalidate();
+    }
+
+
+    @Override
+    public void onBusRouteSearched(BusRouteResult busRouteResult, int i) {
+
+    }
+
+    
+    
+    @Override
+    public void onDriveRouteSearched(DriveRouteResult driveRouteResult, int i) {
+//        DrivingRouteOverlay drivingRouteOverlay = new DrivingRouteOverlay(
+//                this, aMap, drivePath, result.getStartPos(), result.getTargetPos());
+//        aMap.clear();
+//        drivingRouteOverlay.removeFromMap();
+//        drivingRouteOverlay.addToMap();
+//        drivingRouteOverlay.zoomToSpan();
+        
+    }
+
+    @Override
+    public void onWalkRouteSearched(WalkRouteResult walkRouteResult, int i) {
+
+    }
+
+    @Override
+    public void onRideRouteSearched(RideRouteResult rideRouteResult, int i) {
 
     }
 }

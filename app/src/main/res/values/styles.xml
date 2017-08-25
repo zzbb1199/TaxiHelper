@@ -9,7 +9,8 @@
         <item name="actionBarSize">48dp</item>
     </style>
     
-    <style name="NoactionBar" parent="AppTheme">
+    <style
+        name="NoactionBar" parent="AppTheme">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
