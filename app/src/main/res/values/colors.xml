@@ -10,6 +10,9 @@
     <color name="secondary_text">#757575</color>
     <color name="search_text">#646464</color>
 
+
+    <color name="translucent_background">#60000000</color>
+    
     <color name="red_50">#ffebff</color>
     <color name="red_100">#ffcdd2</color>
     <color name="red_200">#ef9a9a</color>

@@ -1,12 +1,13 @@
 package com.example.taxihelper.mvp.ui.activities;
 
+import com.example.taxihelper.R;
 import com.example.taxihelper.mvp.ui.activities.base.BaseActivity;
 
 /**
  * Created by 张兴锐 on 2017/8/26.
  */
 
-public class OrderDetailActivity extends BaseActivity {
+public class WaitingDriverArriveActivity extends BaseActivity {
     @Override
     public void initInjector() {
         
@@ -19,6 +20,6 @@ public class OrderDetailActivity extends BaseActivity {
 
     @Override
     public int getLayout() {
-        return 0;
+        return R.layout.activity_driver_arrive;
     }
 }
