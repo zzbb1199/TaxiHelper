@@ -6,24 +6,30 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Point;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
@@ -89,7 +95,7 @@ import rx.functions.Action1;
  * Created by 张兴锐 on 2017/8/8.
  */
 
-public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContract.View, AMap.OnMyLocationChangeListener, GeocodeSearch.OnGeocodeSearchListener, AMap.OnCameraChangeListener, RouteSearch.OnRouteSearchListener, AMap.OnMapLoadedListener {
+public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContract.View, AMap.OnMyLocationChangeListener, GeocodeSearch.OnGeocodeSearchListener, AMap.OnCameraChangeListener, RouteSearch.OnRouteSearchListener, AMap.OnMapLoadedListener, NavigationView.OnNavigationItemSelectedListener {
 
 
     @InjectView(R.id.location_dot)
@@ -147,7 +153,7 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
     private int choosedServiceId = 14;//默认为立即叫车
     private String estimateId;
     private String passengerName = "张兴锐";
-    private String passengerMobile = "15086943351";
+    private String passengerMobile = "15086943358";
 
     private int startCityId;
     private int screenCenterX;
@@ -241,8 +247,18 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
     public void initViews() {
         setSupportActionBar(mToolBar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
-        mToolBar.setTitle("TaxiHelper");
-        mToolBar.setTitleTextColor(Color.WHITE);
+//        mToolBar.setTitle("TaxiHelper");
+//        mToolBar.setTitleTextColor(Color.WHITE);
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, mToolBar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.setDrawerListener(toggle);
+        toggle.syncState();
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+
+
         //初始化地图控制器对象
         if (aMap == null) {
             aMap = mMapView.getMap();
@@ -302,7 +318,7 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
      *
      * @param location
      */
-   
+
 
     @Override
     public void onMyLocationChange(Location location) {
@@ -406,7 +422,6 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
                     hasCallTaxi = true;
 
 
-
                 }
             }
 
@@ -502,7 +517,13 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
     @Override
     public void showCreateOrderResult(CreateOrder createOrder) {
         Log.i(TAG, createOrder.toString());
-        
+        //将创建的订单，存入到数据库
+
+        //将得到orderId，传入给下一个Activity
+        Intent intent = new Intent(this, WaitingDriveAcceptActivity.class);
+        intent.putExtra(Constant.ORDER_ID, createOrder.getOrderId());
+        startActivity(intent);
+        finish();
     }
 
     @Override
@@ -806,5 +827,60 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
         mMapView.onSaveInstanceState(outState);
     }
 
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        // Handle navigation view item clicks here.
+        int id = item.getItemId();
+
+        switch (id){
+            case R.id.charge_amount:
+                //弹窗
+                View view = LayoutInflater.from(this).inflate(R.layout.dialog_charge,null);
+                AlertDialog dialog = new AlertDialog.Builder(this)
+                        .setView(view)
+                        .create();
+                dialog.show();
+                final EditText inputPhoneNum = view.findViewById(R.id.input_charge_phone);
+                final EditText inputAount = view.findViewById(R.id.input_charge_num);
+                Button confirm = view.findViewById(R.id.confirm_charge);
+                confirm.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        String phoneNum = inputPhoneNum.getText().toString().trim();
+                        String amount = inputAount.getText().toString().trim();
+                        if (amount.equals("") || phoneNum.equals("")){
+                            ToastUtil.shortToast("请填入完整信息");
+                            return;
+                        }
+                        presenter.chargeAmount(Integer.valueOf(amount),phoneNum);
+                    }
+                });
+                break;
+            case R.id.history_order:
+                break;
+            case R.id.team:
+                break;
+            case R.id.author:
+                break;
+        }
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
+    }
+
+    @Override
+    public void onBackPressed() {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+   
+    
 
 }

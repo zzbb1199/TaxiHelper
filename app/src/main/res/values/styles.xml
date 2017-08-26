@@ -8,7 +8,7 @@
         <item name="colorAccent">@color/colorAccent</item>
         <item name="actionBarSize">48dp</item>
     </style>
-    
+
     <style
         name="NoactionBar" parent="AppTheme">
         <item name="windowActionBar">false</item>
@@ -32,28 +32,37 @@
         <item name="android:windowIsTranslucent">true</item>
     </style>
 
+    <style name="AppTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
+
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light"/>
+
     <!--<style name="CircularBarPagerStyle">-->
-        <!--<item name="android:layout_height">match_parent</item>-->
-        <!--<item name="android:layout_width">match_parent</item>-->
+    <!--<item name="android:layout_height">match_parent</item>-->
+    <!--<item name="android:layout_width">match_parent</item>-->
 
-        <!--<item name="progress_arc_max">100</item>-->
-        <!--<item name="arc_progress">50</item>-->
-        <!---->
-        <!--<item name="progress_arc_clockwise_outline_width">0.75dp</item>-->
-        <!--<item name="progress_arc_counter_clockwise_outline_width">0.75dp</item>-->
-        <!--<item name="progress_arc_clockwise_width">8dp</item>-->
-        <!--<item name="progress_arc_counter_clockwise_width">8dp</item>-->
+    <!--<item name="progress_arc_max">100</item>-->
+    <!--<item name="arc_progress">50</item>-->
+    <!---->
+    <!--<item name="progress_arc_clockwise_outline_width">0.75dp</item>-->
+    <!--<item name="progress_arc_counter_clockwise_outline_width">0.75dp</item>-->
+    <!--<item name="progress_arc_clockwise_width">8dp</item>-->
+    <!--<item name="progress_arc_counter_clockwise_width">8dp</item>-->
 
-        <!--<item name="progress_start_line_enabled">true</item>-->
-        <!--<item name="progress_pager_on_click_enabled">true</item>-->
-        <!---->
-        <!--//内部填充色-->
-        <!--<item name="progress_pager_fill_circle_color">#00000000</item>-->
-        <!---->
-        <!--<item name="progress_arc_clockwise_color">@color/colorPrimary</item>-->
-        <!--<item name="progress_arc_clockwise_outline_color">@color/colorPrimaryDark</item>-->
-        <!--<item name="progress_arc_counter_clockwise_color">@color/yellow_500</item>-->
-        <!--<item name="progress_arc_counter_clockwise_outline_color">@color/yellow_500</item>-->
-        <!--<item name="progress_pager_fill_mode">default_mode</item>-->
+    <!--<item name="progress_start_line_enabled">true</item>-->
+    <!--<item name="progress_pager_on_click_enabled">true</item>-->
+    <!---->
+    <!--//内部填充色-->
+    <!--<item name="progress_pager_fill_circle_color">#00000000</item>-->
+    <!---->
+    <!--<item name="progress_arc_clockwise_color">@color/colorPrimary</item>-->
+    <!--<item name="progress_arc_clockwise_outline_color">@color/colorPrimaryDark</item>-->
+    <!--<item name="progress_arc_counter_clockwise_color">@color/yellow_500</item>-->
+    <!--<item name="progress_arc_counter_clockwise_outline_color">@color/yellow_500</item>-->
+    <!--<item name="progress_pager_fill_mode">default_mode</item>-->
     <!--</style>-->
 </resources>

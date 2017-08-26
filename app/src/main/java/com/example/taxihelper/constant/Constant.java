@@ -53,4 +53,10 @@ public class Constant {
     public static final String CAR_TYPE = "car_type";
     public static final String CAR_PRICES = "price";
     public static final String CAR_GROUP_ID ="car_group_id";
+
+
+    /**
+     * 订单
+     */
+    public static final String ORDER_ID = "order_id";
 }

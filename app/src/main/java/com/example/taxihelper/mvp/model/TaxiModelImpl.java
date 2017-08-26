@@ -55,5 +55,10 @@ public class TaxiModelImpl extends BaseModelImpl implements TaxiContract.Model {
         return filterStatus(getApi().getUserInfo(accessToken));
     }
 
+    @Override
+    public Observable<String> chargeAmount(Integer amount, String phoneNum) {
+        return filterStatus(getApi().chargeAccount(accessToken,amount,phoneNum));
+    }
+
 
 }

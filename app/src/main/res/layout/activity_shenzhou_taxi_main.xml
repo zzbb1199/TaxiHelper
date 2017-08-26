@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/app_bar_layout"
+        android:theme="@style/AppTheme.AppBarOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
+                app:popupTheme="@style/AppTheme.PopupOverlay"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="@color/colorPrimary">
+            </android.support.v7.widget.Toolbar>
+            <ImageView
+                android:id="@+id/type_choose"
+                android:layout_marginRight="16dp"
+                android:layout_alignParentRight="true"
+                android:layout_centerInParent="true"
+                android:src="@drawable/add"
+                android:layout_width="32dp"
+                android:layout_height="32dp"/>
+        </RelativeLayout>
+
+    </android.support.design.widget.AppBarLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/card_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerInParent="true"
+            android:layout_margin="8dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:id="@+id/location_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:orientation="horizontal">
+
+                    <com.example.taxihelper.widget.CircleView
+                        android:id="@+id/location_dot"
+                        android:layout_width="10dp"
+                        android:layout_height="10dp"
+                        android:layout_gravity="center"
+                        android:layout_marginLeft="16dp"
+                        android:background="@color/white"
+                        app:color="@color/grey_500"/>
+
+                    <TextView
+                        android:id="@+id/location_text"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:gravity="start|center"
+                        android:paddingLeft="16dp"
+                        android:text="正在为您定位中..."
+                        android:textColor="@color/primary_text"/>
+                </LinearLayout>
+
+                <include
+                    layout="@layout/view_search_divider"
+                    ></include>
+
+                <LinearLayout
+                    android:id="@+id/go_to_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:orientation="horizontal">
+
+                    <com.example.taxihelper.widget.CircleView
+                        android:layout_width="10dp"
+                        android:layout_height="10dp"
+                        android:layout_gravity="center"
+                        android:layout_marginLeft="16dp"
+                        android:background="@color/white"
+                        app:color="@color/red_500"/>
+
+                    <TextView
+                        android:id="@+id/go_to_text"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:gravity="start|center"
+                        android:paddingLeft="16dp"
+                        android:text="请输入上车地点..."
+                        android:textColor="@color/primary_text"/>
+                </LinearLayout>
+            </LinearLayout>
+        </android.support.v7.widget.CardView>
+
+        <Button
+            android:id="@+id/location"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_below="@id/card_view"
+            android:text="定位"/>
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/taxi_result_info"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_margin="16dp"
+            android:visibility="invisible"
+            app:cardCornerRadius="4dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="8dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/distance"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="预估距离:"
+                        android:textColor="@color/primary_text"
+                        android:textSize="@dimen/font_normal"/>
+
+                    <TextView
+                        android:id="@+id/time_cost"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="预估耗时:"
+                        android:textColor="@color/primary_text"
+                        android:textSize="@dimen/font_normal"/>
+                </LinearLayout>
+
+                <android.support.v4.view.ViewPager
+                    android:id="@+id/viewPager"
+                    android:layout_width="match_parent"
+                    android:layout_height="100dp">
+                </android.support.v4.view.ViewPager>
+
+
+                <Button
+                    android:id="@+id/confirm_taxi"
+                    android:layout_width="match_parent"
+                    android:layout_height="36dp"
+                    android:layout_marginLeft="32dp"
+                    android:layout_marginRight="32dp"
+                    android:background="@drawable/bt_bg"
+                    android:text="立即叫车"
+                    android:textColor="@color/white"/>
+            </LinearLayout>
+
+        </android.support.v7.widget.CardView>
+
+
+        <com.amap.api.maps.MapView
+            android:id="@+id/map"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true">
+        </com.amap.api.maps.MapView>
+
+        <ImageView
+            android:id="@+id/center_image"
+            android:layout_width="@dimen/image_size_normal"
+            android:layout_height="@dimen/image_size_normal"
+            android:layout_centerInParent="true"
+            android:src="@drawable/now_location_icon"/>
+    </RelativeLayout>
+
+</LinearLayout>

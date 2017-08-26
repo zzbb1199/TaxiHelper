@@ -6,6 +6,7 @@ import com.example.taxihelper.mvp.entity.CreateOrder;
 import com.example.taxihelper.mvp.entity.Data;
 import com.example.taxihelper.mvp.entity.GainAccessToken;
 import com.example.taxihelper.mvp.entity.NearbyCarInfo;
+import com.example.taxihelper.mvp.entity.OrderDetailInfo;
 import com.example.taxihelper.mvp.entity.TaxiPriceInfo;
 import com.example.taxihelper.mvp.entity.UserInfo;
 
@@ -111,5 +112,18 @@ public interface Api {
      */
     @GET("/v1/resource/user/getUserInfo")
     Observable<Data<UserInfo>> getUserInfo(@Query("access_token") String accessToken);
+
+    /**
+     * 订单详情
+     */
+    @GET("/v1/resource/order/getOrderDetail")
+    Observable<Data<OrderDetailInfo>> getOrderDetail(@Query("access_token") String accessToken,@Query("orderId") String orderId);
+
+    /**
+     * 充值
+     */
+    @POST("/v1/action/user/recharge")
+    @FormUrlEncoded
+    Observable<Data<String>> chargeAccount(@Field("access_token") String accessToken,@Field("amount") Integer amount,@Field("mobile") String phoneNum);
 }
     

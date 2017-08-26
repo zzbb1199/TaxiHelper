@@ -32,6 +32,8 @@ public interface TaxiContract {
                                             double elat,double elot,String estimateId);
         
         Observable<UserInfo> getUserInfo();
+        
+        Observable<String> chargeAmount(Integer amount,String phoneNum);
     }
 
     interface View extends BaseView {
@@ -61,5 +63,7 @@ public interface TaxiContract {
                           double elat,double elot,String estimateId);
         
         void getUserInfo();
+        
+        void chargeAmount(Integer amount,String phoneNum);
     }
 }
