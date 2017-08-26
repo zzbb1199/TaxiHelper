@@ -14,5 +14,16 @@
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
-    
+
+
+    <style name="order_detail_former">
+        <item name="android:textColor">@color/primary_text</item>
+        <item name="android:textSize">@dimen/font_large</item>
+    </style>
+
+    <style name="order_detail_later">
+        <item name="android:textColor">@color/secondary_text</item>
+        <item name="android:textSize">@dimen/font_large</item>
+    </style>
+
 </resources>

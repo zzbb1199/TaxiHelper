@@ -502,6 +502,7 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
     @Override
     public void showCreateOrderResult(CreateOrder createOrder) {
         Log.i(TAG, createOrder.toString());
+        
     }
 
     @Override
