@@ -26,6 +26,7 @@ public interface Api {
 
     /**
      * 获取accessToken
+     *
      * @param clientId
      * @param clientSecret
      * @param type
@@ -40,6 +41,7 @@ public interface Api {
 
     /**
      * 更新授权
+     *
      * @param clientId
      * @param cliendSeret
      * @param type
@@ -53,6 +55,7 @@ public interface Api {
 
     /**
      * 获取城市服务
+     *
      * @param accessToken
      * @param slat
      * @param slng
@@ -72,21 +75,23 @@ public interface Api {
      * 获取临近车辆
      */
     @GET("/v1/resource/common/getNearbyCarInfo")
-    Observable<Data<NearbyCarInfo>> getNearbyCarInfo(@Query("access_token") String accessToken,@Query("slat") double slat,@Query("slng") double slot);
+    Observable<Data<NearbyCarInfo>> getNearbyCarInfo(@Query("access_token") String accessToken, @Query("slat") double slat, @Query("slng") double slot);
 
     /**
      * 费用预估
      */
     @POST("/v1/resource/common/estimate/price")
     @FormUrlEncoded
-    Observable<Data<TaxiPriceInfo>> getTaxiPriceInfo(@Query("access_token") String accessToken,@Field("slat") double slat,@Field("slng") double slot,
-                                               @Field("elat") double elat,@Field("elng") double elng,
-                                               @Field("serviceId") Integer serviceId,
-                                               @Field("cityId") Integer cityId,
-                                               @Field("departureTime") Long departureTime,
-                                               @Field("flt") String flt,@Field("flightDate") Long flightDate,
-                                               @Field("flightDelayTime") Integer flightDelayTime,
-                                               @Field("airCode") String airCode);
+    Observable<Data<TaxiPriceInfo>> getTaxiPriceInfo(@Query("access_token") String accessToken, @Field("slat") double slat, @Field("slng") double slot,
+                                                     @Field("elat") double elat, @Field("elng") double elng,
+                                                     @Field("serviceId") Integer serviceId);
+    /**
+     *  @Field("cityId") Integer cityId
+     @Field("departureTime") Long departureTime,
+     @Field("flt") String flt,@Field("flightDate") Long flightDate,
+     @Field("flightDelayTime") Integer flightDelayTime,
+     @Field("airCode") String airCode)
+     */
 
 
     /**
@@ -94,17 +99,17 @@ public interface Api {
      */
     @POST("/v1/action/order/create")
     @FormUrlEncoded
-    Observable<Data<CreateOrder>> createOrder(@Query("access_token") String accessToken,@Field("serviceId") Integer serviceId,
-                                              @Field("carGroupId") Integer carGroupId,@Field("passengerMobile") String passengerMobil,
-                                              @Field("passengerName") String passengerName,@Field("slat") double slat,@Field("slng") double slot,
-                                              @Field("startName") String startName,@Field("startAddress") String startAddress,
-                                              @Field("endName") String endName,@Field("endAddress") String endAddress,
-                                              @Field("elat") double elat,@Field("elng") double elot,@Field("estimateId") String estimateId);
+    Observable<Data<CreateOrder>> createOrder(@Query("access_token") String accessToken, @Field("serviceId") Integer serviceId,
+                                              @Field("carGroupId") Integer carGroupId, @Field("passengerMobile") String passengerMobil,
+                                              @Field("passengerName") String passengerName, @Field("slat") double slat, @Field("slng") double slot,
+                                              @Field("startName") String startName, @Field("startAddress") String startAddress,
+                                              @Field("endName") String endName, @Field("endAddress") String endAddress,
+                                              @Field("elat") double elat, @Field("elng") double elot, @Field("estimateId") String estimateId);
 
     /**
      * 用户信息
      */
     @GET("/v1/resource/user/getUserInfo")
-    Observable<Data<UserInfo>> getUserInfo(@Query("access_token")String accessToken);
+    Observable<Data<UserInfo>> getUserInfo(@Query("access_token") String accessToken);
 }
     

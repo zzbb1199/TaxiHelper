@@ -36,9 +36,10 @@ public class TaxiModelImpl extends BaseModelImpl implements TaxiContract.Model {
     @Override
     public Observable<TaxiPriceInfo> getTaxiPrice(double slat, double slng, double elat, double elng, Integer serviceId, 
                                                   Integer cityId, Long departureTime, String flt, Long flightDate, Integer flightDelayTime, String airCode) {
-        return filterStatus(getApi().getTaxiPriceInfo(accessToken,slat,slng,elat,elng,serviceId,cityId,
-                departureTime,flt,flightDate,
-                flightDelayTime,airCode));
+        return filterStatus(getApi().getTaxiPriceInfo(accessToken,slat,slng,elat,elng,serviceId));
+//        ,cityId,
+//                departureTime,flt,flightDate,
+//                flightDelayTime,airCode));
     }
 
     @Override

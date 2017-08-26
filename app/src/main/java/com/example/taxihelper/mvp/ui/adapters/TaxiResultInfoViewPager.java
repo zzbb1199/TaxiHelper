@@ -24,4 +24,8 @@ public class TaxiResultInfoViewPager extends BaseViewPagerAdapter {
         super(fm);
         this.list = list;
     }
+    
+    public void clear(){
+        list = null;
+    }
 }

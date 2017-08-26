@@ -142,12 +142,13 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
     boolean userChooseLocation = false;
     private boolean isChooseEnd = false;
     private boolean hasCallTaxi = false;
+    private boolean isFirstMapLoad = false;
     double slat, slot, elat, elot;
     private int choosedServiceId = 14;//默认为立即叫车
     private String estimateId;
     private String passengerName = "张兴锐";
     private String passengerMobile = "15086943351";
-    
+
     private int startCityId;
     private int screenCenterX;
     private int screenCenterY;
@@ -301,12 +302,11 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
      *
      * @param location
      */
-    private boolean isFirstMapLoad = false;
+   
 
     @Override
     public void onMyLocationChange(Location location) {
         Log.i(TAG, "首次定位");
-        isFirstMapLoad = true;
         //逆地址解析
         double lat = location.getLatitude();
         double lot = location.getLongitude();
@@ -404,6 +404,9 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
                     calculateDriveRoute();
                     presenter.getTaxiPrice(slat, slot, elat, elot, choosedServiceId, startCityId, null, null, null, null, null);
                     hasCallTaxi = true;
+
+
+
                 }
             }
 
@@ -422,7 +425,7 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
         } else if (type == Constant.TYPE_END) {
             bitMap = BitmapFactory.decodeResource(getResources(), R.drawable.go_down_location);
         } else {
-            bitMap = BitmapFactory.decodeResource(getResources(), R.drawable.now_location_icon);
+            bitMap = BitmapFactory.decodeResource(getResources(), R.drawable.car_map_icon);
         }
         int width = bitMap.getWidth();
         int height = bitMap.getHeight();
@@ -522,13 +525,6 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
         if (index == 4) {
             tv.setBackground(null);
         }
-        tv.post(new Runnable() {
-            @Override
-            public void run() {
-                Log.i(TAG, tv.getHeight() + "高");
-                Log.i(TAG, tv.getWidth() + "宽");
-            }
-        });
         typeLinear.addView(tv);
         tv.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -538,39 +534,6 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
                 pw.dismiss();
             }
         });
-    }
-
-
-    /*********************************************************************************************/
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        //在activity执行onDestroy时执行mMapView.onDestroy()，销毁地图
-        mMapView.onDestroy();
-        if (pw != null) {
-            pw = null;//释放引用
-        }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        //在activity执行onResume时执行mMapView.onResume ()，重新绘制加载地图
-        mMapView.onResume();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        //在activity执行onPause时执行mMapView.onPause ()，暂停地图的绘制
-        mMapView.onPause();
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        //在activity执行onSaveInstanceState时执行mMapView.onSaveInstanceState (outState)，保存地图当前的状态
-        mMapView.onSaveInstanceState(outState);
     }
 
 
@@ -622,7 +585,11 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
         goToView.setClickable(clickAble);
     }
 
-
+    /**
+     * 附近车辆
+     *
+     * @param nearbyCarInfo
+     */
     @Override
     public void showNearbyCarInfo(NearbyCarInfo nearbyCarInfo) {
         Log.i(TAG, nearbyCarInfo.toString());
@@ -642,28 +609,39 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
             for (NearbyCarInfo.CarListBean car : nearbyCarInfo.getCarList()) {
                 addMarker(Double.valueOf(car.getLat()), Double.valueOf(car.getLng()), Constant.TYPE_CAR);
             }
+            /**
+             * 每辆车有个最短到达时间，后期可能能用到
+             */
         }
     }
 
+    /**
+     * 格式控制器
+     */
     DecimalFormat df = new DecimalFormat("#.0");
 
+    /**
+     * 打车价格结果
+     *
+     * @param taxiPriceInfo
+     */
     @Override
     public void showPriceResult(TaxiPriceInfo taxiPriceInfo) {
         Log.i(TAG, taxiPriceInfo.toString());
         //加入车辆
         taxiResultInfo.setVisibility(View.VISIBLE);
-        estimateId = taxiPriceInfo.getEstimateid();
+        estimateId = taxiPriceInfo.getEstimateId();
         distanceTv.setText("预估距离:" + df.format(taxiPriceInfo.getDistance() / 1000) + "km");
         timeCostTv.setText("预计耗时:" + taxiPriceInfo.getDuration() + "min");
         List<Fragment> fragments = new ArrayList<>();
-
+        adapter.clear();
         //初始化Fragment
-        for (TaxiPriceInfo.Prices prices : taxiPriceInfo.getPrices()) {
+        for (TaxiPriceInfo.PricesBean prices : taxiPriceInfo.getPrices()) {
             Fragment fragment = new TaxiKindsFragment();
             Bundle bundle = new Bundle();
             bundle.putString(Constant.CAR_TYPE, prices.getName());
             bundle.putFloat(Constant.CAR_PRICES, prices.getPrice());
-            bundle.putInt(Constant.CAR_GROUP_ID, prices.getCargroupid());
+            bundle.putInt(Constant.CAR_GROUP_ID, prices.getCarGroupId());
             fragment.setArguments(bundle);
             fragments.add(fragment);
         }
@@ -679,29 +657,29 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
 
 
     /**
-     * 地图层移动监听
+     * 地图层移动监听 用来根据屏幕中心来进行移动定位位置显示
      *
      * @param cameraPosition
      */
     boolean isFirstRecocd = true;//记录屏幕中心点的辅助变量
+
     @Override
     public void onCameraChangeFinish(CameraPosition cameraPosition) {
         //获取可视区
         Log.i(TAG, "地图移动层完成");
         if (!isFirstMapLoad) {
-            //因为必须要等首次定位完成，才可以用屏幕点进行定位
+            //因为必须要等地图加载完成，才可以用屏幕点进行定位
             return;
         }
         if (hasCallTaxi) {
             return;
         }
-        
+
         if (isFirstRecocd) {
             //aMap.clear();//清除原点定位
             setOriginLocationMarker();
             isFirstRecocd = false;
         }
-
 
         nowZoom = cameraPosition.zoom;//更新zoom
         //根据屏幕中心点重新进行定位
@@ -794,4 +772,38 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
     public void onMapLoaded() {
         isFirstMapLoad = true;
     }
+
+    /*********************************************************************************************/
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        //在activity执行onDestroy时执行mMapView.onDestroy()，销毁地图
+        mMapView.onDestroy();
+        if (pw != null) {
+            pw = null;//释放引用
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        //在activity执行onResume时执行mMapView.onResume ()，重新绘制加载地图
+        mMapView.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        //在activity执行onPause时执行mMapView.onPause ()，暂停地图的绘制
+        mMapView.onPause();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        //在activity执行onSaveInstanceState时执行mMapView.onSaveInstanceState (outState)，保存地图当前的状态
+        mMapView.onSaveInstanceState(outState);
+    }
+
+
 }

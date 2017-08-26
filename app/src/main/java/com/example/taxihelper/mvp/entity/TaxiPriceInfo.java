@@ -7,213 +7,234 @@ import java.util.List;
  */
 
 public class TaxiPriceInfo {
-    private int distance;
-    private int duration;
-    private String estimateid;
-    private List<Prices> prices;
 
-    public void setDistance(int distance) {
-        this.distance = distance;
-    }
+    /**
+     * distance : 22983
+     * duration : 45
+     * estimateId : 09135ac099faf7bbff46adf755b30a48
+     * prices : [{"carGroupId":2,"companyDiscountAmount":0,"floatFactor":2,"kilometrePrice":114.9,"longDistancePrice":83.92,"longDistancePriceLimit":2,"name":"公务轿车","outCityPrice":0,"perKilometrePrice":5,"perLongDistancePrice":4,"perTimePrice":3,"price":353,"priceType":1,"productKilometre":0,"productTime":0,"startPrice":20,"timePrice":135},{"carGroupId":1,"companyDiscountAmount":0,"floatFactor":2,"kilometrePrice":45.96,"longDistancePrice":45.96,"longDistancePriceLimit":0,"name":"优驾舒享","outCityPrice":0,"perKilometrePrice":2,"perLongDistancePrice":2,"perTimePrice":4.2,"price":300,"priceType":1,"productKilometre":0,"productTime":0,"startPrice":20,"timePrice":189},{"carGroupId":3,"companyDiscountAmount":0,"floatFactor":2,"kilometrePrice":128.69,"longDistancePrice":75.02,"longDistancePriceLimit":10,"name":"商务7座","outCityPrice":0,"perKilometrePrice":5.6,"perLongDistancePrice":5.78,"perTimePrice":3,"price":340,"priceType":1,"productKilometre":0,"productTime":0,"startPrice":2,"timePrice":135},{"carGroupId":4,"companyDiscountAmount":0,"floatFactor":2,"kilometrePrice":22.98,"longDistancePrice":83.92,"longDistancePriceLimit":2,"name":"豪华轿车","outCityPrice":0,"perKilometrePrice":1,"perLongDistancePrice":4,"perTimePrice":2,"price":216,"priceType":1,"productKilometre":0,"productTime":0,"startPrice":20,"timePrice":90}]
+     */
 
-    public int getDistance() {
+    private float distance;
+    private float duration;
+    private String estimateId;
+    private List<PricesBean> prices;
+
+    public float getDistance() {
         return distance;
     }
 
-    public void setDuration(int duration) {
-        this.duration = duration;
+    public void setDistance(float distance) {
+        this.distance = distance;
     }
 
-    public int getDuration() {
+    public float getDuration() {
         return duration;
     }
 
-    public void setEstimateid(String estimateid) {
-        this.estimateid = estimateid;
+    public void setDuration(float duration) {
+        this.duration = duration;
     }
 
-    public String getEstimateid() {
-        return estimateid;
+    public String getEstimateId() {
+        return estimateId;
     }
 
-    public void setPrices(List<Prices> prices) {
-        this.prices = prices;
+    public void setEstimateId(String estimateId) {
+        this.estimateId = estimateId;
     }
 
-    public List<Prices> getPrices() {
+    public List<PricesBean> getPrices() {
         return prices;
     }
 
-    public static class Prices {
+    public void setPrices(List<PricesBean> prices) {
+        this.prices = prices;
+    }
 
+    public static class PricesBean {
+        /**
+         * carGroupId : 2
+         * companyDiscountAmount : 0
+         * floatFactor : 2
+         * kilometrePrice : 114.9
+         * longDistancePrice : 83.92
+         * longDistancePriceLimit : 2
+         * name : 公务轿车
+         * outCityPrice : 0
+         * perKilometrePrice : 5
+         * perLongDistancePrice : 4
+         * perTimePrice : 3
+         * price : 353
+         * priceType : 1
+         * productKilometre : 0
+         * productTime : 0
+         * startPrice : 20
+         * timePrice : 135
+         */
 
-        private int cargroupid;
-
-        private int companydiscountamount;
-
-        private int floatfactor;
-
-        private double kilometreprice;
-
-        private int longdistanceprice;
-
-        private int longdistancepricelimit;
+        private int carGroupId;
+        private float companyDiscountAmount;
+        private float floatFactor;
+        private float kilometrePrice;
+        private float longDistancePrice;
+        private float longDistancePriceLimit;
         private String name;
+        private float outCityPrice;
+        private float perKilometrePrice;
+        private float perLongDistancePrice;
+        private float perTimePrice;
+        private float price;
+        private int priceType;
+        private float productKilometre;
+        private float productTime;
+        private float startPrice;
+        private float timePrice;
 
-        private int outcityprice;
-
-        private double perkilometreprice;
-
-        private int perlongdistanceprice;
-
-        private double pertimeprice;
-        private int price;
-
-        private int pricetype;
-
-        private int productkilometre;
-
-        private int producttime;
-
-        private int startprice;
-     
-        private double timeprice;
-
-        public void setCargroupid(int cargroupid) {
-            this.cargroupid = cargroupid;
+        public int getCarGroupId() {
+            return carGroupId;
         }
 
-        public int getCargroupid() {
-            return cargroupid;
+        public void setCarGroupId(int carGroupId) {
+            this.carGroupId = carGroupId;
         }
 
-        public void setCompanydiscountamount(int companydiscountamount) {
-            this.companydiscountamount = companydiscountamount;
+        public float getCompanyDiscountAmount() {
+            return companyDiscountAmount;
         }
 
-        public int getCompanydiscountamount() {
-            return companydiscountamount;
+        public void setCompanyDiscountAmount(float companyDiscountAmount) {
+            this.companyDiscountAmount = companyDiscountAmount;
         }
 
-        public void setFloatfactor(int floatfactor) {
-            this.floatfactor = floatfactor;
+        public float getFloatFactor() {
+            return floatFactor;
         }
 
-        public int getFloatfactor() {
-            return floatfactor;
+        public void setFloatFactor(float floatFactor) {
+            this.floatFactor = floatFactor;
         }
 
-        public void setKilometreprice(double kilometreprice) {
-            this.kilometreprice = kilometreprice;
+        public float getKilometrePrice() {
+            return kilometrePrice;
         }
 
-        public double getKilometreprice() {
-            return kilometreprice;
+        public void setKilometrePrice(float kilometrePrice) {
+            this.kilometrePrice = kilometrePrice;
         }
 
-        public void setLongdistanceprice(int longdistanceprice) {
-            this.longdistanceprice = longdistanceprice;
+        public float getLongDistancePrice() {
+            return longDistancePrice;
         }
 
-        public int getLongdistanceprice() {
-            return longdistanceprice;
+        public void setLongDistancePrice(float longDistancePrice) {
+            this.longDistancePrice = longDistancePrice;
         }
 
-        public void setLongdistancepricelimit(int longdistancepricelimit) {
-            this.longdistancepricelimit = longdistancepricelimit;
+        public float getLongDistancePriceLimit() {
+            return longDistancePriceLimit;
         }
 
-        public int getLongdistancepricelimit() {
-            return longdistancepricelimit;
-        }
-
-        public void setName(String name) {
-            this.name = name;
+        public void setLongDistancePriceLimit(float longDistancePriceLimit) {
+            this.longDistancePriceLimit = longDistancePriceLimit;
         }
 
         public String getName() {
             return name;
         }
 
-        public void setOutcityprice(int outcityprice) {
-            this.outcityprice = outcityprice;
+        public void setName(String name) {
+            this.name = name;
         }
 
-        public int getOutcityprice() {
-            return outcityprice;
+        public float getOutCityPrice() {
+            return outCityPrice;
         }
 
-        public void setPerkilometreprice(double perkilometreprice) {
-            this.perkilometreprice = perkilometreprice;
+        public void setOutCityPrice(float outCityPrice) {
+            this.outCityPrice = outCityPrice;
         }
 
-        public double getPerkilometreprice() {
-            return perkilometreprice;
+        public float getPerKilometrePrice() {
+            return perKilometrePrice;
         }
 
-        public void setPerlongdistanceprice(int perlongdistanceprice) {
-            this.perlongdistanceprice = perlongdistanceprice;
+        public void setPerKilometrePrice(float perKilometrePrice) {
+            this.perKilometrePrice = perKilometrePrice;
         }
 
-        public int getPerlongdistanceprice() {
-            return perlongdistanceprice;
+        public float getPerLongDistancePrice() {
+            return perLongDistancePrice;
         }
 
-        public void setPertimeprice(double pertimeprice) {
-            this.pertimeprice = pertimeprice;
+        public void setPerLongDistancePrice(float perLongDistancePrice) {
+            this.perLongDistancePrice = perLongDistancePrice;
         }
 
-        public double getPertimeprice() {
-            return pertimeprice;
+        public float getPerTimePrice() {
+            return perTimePrice;
         }
 
-        public void setPrice(int price) {
-            this.price = price;
+        public void setPerTimePrice(float perTimePrice) {
+            this.perTimePrice = perTimePrice;
         }
 
-        public int getPrice() {
+        public float getPrice() {
             return price;
         }
 
-        public void setPricetype(int pricetype) {
-            this.pricetype = pricetype;
+        public void setPrice(float price) {
+            this.price = price;
         }
 
-        public int getPricetype() {
-            return pricetype;
+        public float getPriceType() {
+            return priceType;
         }
 
-        public void setProductkilometre(int productkilometre) {
-            this.productkilometre = productkilometre;
+        public void setPriceType(int priceType) {
+            this.priceType = priceType;
         }
 
-        public int getProductkilometre() {
-            return productkilometre;
+        public float getProductKilometre() {
+            return productKilometre;
         }
 
-        public void setProducttime(int producttime) {
-            this.producttime = producttime;
+        public void setProductKilometre(float productKilometre) {
+            this.productKilometre = productKilometre;
         }
 
-        public int getProducttime() {
-            return producttime;
+        public float getProductTime() {
+            return productTime;
         }
 
-        public void setStartprice(int startprice) {
-            this.startprice = startprice;
+        public void setProductTime(float productTime) {
+            this.productTime = productTime;
         }
 
-        public int getStartprice() {
-            return startprice;
+        public float getStartPrice() {
+            return startPrice;
         }
 
-        public void setTimeprice(double timeprice) {
-            this.timeprice = timeprice;
+        public void setStartPrice(float startPrice) {
+            this.startPrice = startPrice;
         }
 
-        public double getTimeprice() {
-            return timeprice;
+        public float getTimePrice() {
+            return timePrice;
         }
 
+        public void setTimePrice(float timePrice) {
+            this.timePrice = timePrice;
+        }
     }
+
+    @Override
+    public String toString() {
+        return "ContentBean{" +
+                "distance=" + distance +
+                ", duration=" + duration +
+                ", estimateId='" + estimateId + '\'' +
+                ", prices=" + prices +
+                '}';
+    }   
 }

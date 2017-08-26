@@ -41,6 +41,7 @@ public class TaxiKindsFragment extends BaseFragment {
         if (getArguments() != null) {
             type = getArguments().getString(Constant.CAR_TYPE);
             price = getArguments().getFloat(Constant.CAR_PRICES);
+            cargroupid = getArguments().getInt(Constant.CAR_GROUP_ID);
         }
     }
 
