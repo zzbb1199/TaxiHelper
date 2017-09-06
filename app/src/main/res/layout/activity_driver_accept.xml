@@ -19,17 +19,28 @@
         android:layout_marginTop="8dp"
         android:layout_marginRight="8dp"
         app:layout_constraintRight_toRightOf="parent"/>
+    <Button
+        android:text="取消订单"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/accept"
+        android:layout_marginRight="16dp"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginLeft="8dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:id="@+id/cancel_order"
+        app:layout_constraintHorizontal_bias="0.514"/>
     <TextView
         android:text="当前订单状态:"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
         android:textSize="@dimen/font_large"
         android:gravity="center"
-        app:layout_constraintTop_toBottomOf="@+id/accept"
-        android:layout_marginLeft="8dp"
+        android:layout_marginLeft="16dp"
         app:layout_constraintLeft_toLeftOf="parent"
-        android:id="@+id/textView8"/>
+        android:id="@+id/textView8"
+        android:layout_marginTop="8dp"
+        app:layout_constraintTop_toBottomOf="@+id/cancel_order"/>
     <TextView
         android:id="@+id/current_status"
         android:text="等待"

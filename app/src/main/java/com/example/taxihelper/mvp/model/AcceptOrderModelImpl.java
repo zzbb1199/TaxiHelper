@@ -1,8 +1,12 @@
 package com.example.taxihelper.mvp.model;
 
 import com.example.taxihelper.mvp.contract.AcceptOrderContract;
+import com.example.taxihelper.mvp.entity.CancelOrder;
+import com.example.taxihelper.mvp.entity.CancelOrderReason;
 import com.example.taxihelper.mvp.entity.OrderStatus;
 import com.example.taxihelper.mvp.model.base.BaseModelImpl;
+
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -20,5 +24,15 @@ public class AcceptOrderModelImpl extends BaseModelImpl implements AcceptOrderCo
     @Override
     public Observable<OrderStatus> changeOrderStatus(String orderId, long driverId, String status) {
         return filterStatus(getApi().changOrderStatus(accessToken,orderId,driverId,status));
+    }
+
+    @Override
+    public Observable<CancelOrder> cancelOrder(String orderId, boolean force, Integer reasonId) {
+        return filterStatus(getApi().cancelOrder(accessToken,orderId,force,reasonId));
+    }
+
+    @Override
+    public Observable<List<CancelOrderReason>> cancelOrderReason() {
+        return filterStatus(getApi().cancelOrderReason(accessToken));
     }
 }

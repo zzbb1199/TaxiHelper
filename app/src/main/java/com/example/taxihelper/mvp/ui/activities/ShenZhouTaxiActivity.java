@@ -861,6 +861,7 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
                 ToActivityUtil.toNextActivity(this, ChargeActivity.class);
                 break;
             case R.id.history_order:
+                ToActivityUtil.toNextActivity(this,HistoryOrderActivity.class);
                 break;
             case R.id.team:
                 ToActivityUtil.toNextActivity(this, AboutTeamActivity.class);

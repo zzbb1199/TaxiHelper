@@ -55,6 +55,7 @@
         <activity android:name=".mvp.ui.activities.AboutUsActivity"
           android:theme="@style/NoactionBar"
             ></activity>
+        <activity android:name=".mvp.ui.activities.HistoryOrderActivity"></activity>
         <service android:name=".mvp.ui.service.OrderDetailService"></service>
         <meta-data
             android:name="com.amap.api.v2.apikey"

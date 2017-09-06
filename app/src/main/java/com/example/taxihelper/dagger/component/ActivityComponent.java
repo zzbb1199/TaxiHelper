@@ -24,6 +24,7 @@ import com.example.taxihelper.dagger.scope.ContextLife;
 import com.example.taxihelper.dagger.scope.PerActivity;
 import com.example.taxihelper.mvp.ui.activities.ChargeActivity;
 import com.example.taxihelper.mvp.ui.activities.CityChooseActivity;
+import com.example.taxihelper.mvp.ui.activities.HistoryOrderActivity;
 import com.example.taxihelper.mvp.ui.activities.LoginActivity;
 import com.example.taxihelper.mvp.ui.activities.ShenZhouTaxiActivity;
 import com.example.taxihelper.mvp.ui.activities.WaitingDriveAcceptActivity;
@@ -49,6 +50,8 @@ public interface ActivityComponent {
     void inject(ChargeActivity chargeActivity);
 
     void inject(WaitingDriveAcceptActivity waitingDriveAcceptActivity);
+
+    void inject(HistoryOrderActivity historyOrderActivity);
     //    void inject(ChargeActivity chargeActivity);
 
 

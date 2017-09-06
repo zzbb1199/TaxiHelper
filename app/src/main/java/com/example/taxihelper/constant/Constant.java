@@ -89,6 +89,8 @@ public class Constant {
     public static final String ORRDER_COMPLEDTED = "completed";
     public static final String [] ORDER_STATUS = new String[]{"dispatched","arriving","arrived",
             "serviceStarted","serviceFinished","feeSubmitted","paid","completed"};
-    
-    
+
+
+
+
 }

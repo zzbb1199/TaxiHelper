@@ -1,10 +1,13 @@
 package com.example.taxihelper.net;
 
+import com.example.taxihelper.mvp.entity.CancelOrder;
+import com.example.taxihelper.mvp.entity.CancelOrderReason;
 import com.example.taxihelper.mvp.entity.CitiesInfo;
 import com.example.taxihelper.mvp.entity.CityInfo;
 import com.example.taxihelper.mvp.entity.CreateOrder;
 import com.example.taxihelper.mvp.entity.Data;
 import com.example.taxihelper.mvp.entity.GainAccessToken;
+import com.example.taxihelper.mvp.entity.HistoryOrder;
 import com.example.taxihelper.mvp.entity.NearbyCarInfo;
 import com.example.taxihelper.mvp.entity.OrderDetailInfo;
 import com.example.taxihelper.mvp.entity.OrderStatus;
@@ -134,6 +137,22 @@ public interface Api {
     @FormUrlEncoded
     Observable<Data<OrderStatus>> changOrderStatus(@Field("access_token") String accessToken,@Field("orderId") String orderId,
                                                    @Field("driverId") long driverId,@Field("status") String status);
+    /**
+     * 取消订单
+     */
+    @POST("/v1/action/order/cancel")
+    @FormUrlEncoded
+    Observable<Data<CancelOrder>> cancelOrder(@Field("access_token") String accessToken,@Field("orderId") String orderId,
+                                              @Field("force") boolean force,@Field("reasonId") Integer reasonId);
+
+    /**
+     * 取消订单原因
+     */
+    @POST("/v1/resource/common/getCancelReason")
+    @FormUrlEncoded
+    Observable<Data<List<CancelOrderReason>>> cancelOrderReason(@Field("access_token") String accessToken);
     
+    @GET("/v1/resource/order/history")
+    Observable<Data<HistoryOrder>> getHistroyOrder(@Query("access_token")String accessToken,@Query("limit") Integer limit,@Query("orderStatus") String orderStatus);
 }
     
