@@ -29,7 +29,6 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
@@ -78,6 +77,7 @@ import com.example.taxihelper.utils.others.overlay.DrivingRouteOverlay;
 import com.example.taxihelper.utils.system.ActivityStack;
 import com.example.taxihelper.utils.system.DensityUtil;
 import com.example.taxihelper.utils.system.RxBus;
+import com.example.taxihelper.utils.system.ToActivityUtil;
 import com.example.taxihelper.widget.CircleView;
 
 import java.text.DecimalFormat;
@@ -835,33 +835,15 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
 
         switch (id){
             case R.id.charge_amount:
-                //弹窗
-                View view = LayoutInflater.from(this).inflate(R.layout.dialog_charge,null);
-                AlertDialog dialog = new AlertDialog.Builder(this)
-                        .setView(view)
-                        .create();
-                dialog.show();
-                final EditText inputPhoneNum = view.findViewById(R.id.input_charge_phone);
-                final EditText inputAount = view.findViewById(R.id.input_charge_num);
-                Button confirm = view.findViewById(R.id.confirm_charge);
-                confirm.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        String phoneNum = inputPhoneNum.getText().toString().trim();
-                        String amount = inputAount.getText().toString().trim();
-                        if (amount.equals("") || phoneNum.equals("")){
-                            ToastUtil.shortToast("请填入完整信息");
-                            return;
-                        }
-                        presenter.chargeAmount(Integer.valueOf(amount),phoneNum);
-                    }
-                });
+                ToActivityUtil.toNextActivity(this,ChargeActivity.class);
                 break;
             case R.id.history_order:
                 break;
             case R.id.team:
+                ToActivityUtil.toNextActivity(this,AboutTeamActivity.class);
                 break;
             case R.id.author:
+                ToActivityUtil.toNextActivity(this,AboutUsActivity.class);
                 break;
         }
 

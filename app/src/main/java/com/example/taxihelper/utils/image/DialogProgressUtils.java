@@ -18,6 +18,13 @@ public class DialogProgressUtils {
         }
         dialog.show();
     }
+    public static void ShowDialogProgressWithMsg(Context context,String msg){
+        if (dialog == null) {
+            dialog = new ProgressDialog(context);
+            dialog.setMessage(msg);
+        }
+        dialog.show();
+    }
 
 
     public static void hideDialogProgress() {

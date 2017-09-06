@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:paddingTop="32dp"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical">
+
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <EditText
+            android:id="@+id/account_input"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+ 
+            android:hint="账户"
+            android:inputType="number"
+            android:paddingLeft="16dp"
+            android:textSize="@dimen/font_large"/>
+    </android.support.design.widget.TextInputLayout>
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/ten_yuan"
+            style="@style/charge_tv_style"
+            android:layout_marginTop="16dp"
+            android:text="10元"
+            app:layout_constraintHorizontal_chainStyle="spread"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toLeftOf="@+id/twenty_yuan"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+        <TextView
+            android:id="@+id/twenty_yuan"
+            style="@style/charge_tv_style"
+            android:text="20元"
+            app:layout_constraintBottom_toBottomOf="@+id/ten_yuan"
+            app:layout_constraintLeft_toRightOf="@+id/ten_yuan"
+            app:layout_constraintRight_toLeftOf="@+id/thirty_yuan"
+            app:layout_constraintTop_toTopOf="@+id/ten_yuan"
+            app:layout_constraintVertical_bias="1.0"/>
+
+        <TextView
+            android:id="@+id/thirty_yuan"
+            style="@style/charge_tv_style"
+            android:layout_marginTop="0dp"
+            android:text="30元"
+            app:layout_constraintBottom_toBottomOf="@+id/twenty_yuan"
+            app:layout_constraintLeft_toRightOf="@+id/twenty_yuan"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/twenty_yuan"/>
+
+        <TextView
+            android:id="@+id/fifty_yuan"
+            style="@style/charge_tv_style"
+            android:layout_marginTop="16dp"
+            android:text="50元"
+            app:layout_constraintHorizontal_chainStyle="spread"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toLeftOf="@id/twenty_yuan"
+            app:layout_constraintTop_toBottomOf="@id/ten_yuan"/>
+
+        <TextView
+            android:id="@+id/one_thousand_yuan"
+            style="@style/charge_tv_style"
+            android:text="100元"
+            app:layout_constraintBottom_toBottomOf="@id/fifty_yuan"
+            app:layout_constraintLeft_toRightOf="@+id/fifty_yuan"
+            app:layout_constraintRight_toLeftOf="@id/thirty_yuan"
+            app:layout_constraintTop_toTopOf="@+id/fifty_yuan"
+            app:layout_constraintVertical_bias="1.0"/>
+
+        <TextView
+            android:id="@+id/two_thousand_yuan"
+            style="@style/charge_tv_style"
+            android:layout_marginTop="0dp"
+            android:text="200元"
+            app:layout_constraintBottom_toBottomOf="@+id/one_thousand_yuan"
+            app:layout_constraintLeft_toRightOf="@+id/one_thousand_yuan"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/one_thousand_yuan"/>
+    </android.support.constraint.ConstraintLayout>
+
+</LinearLayout>

@@ -22,6 +22,7 @@ import android.content.Context;
 import com.example.taxihelper.dagger.module.ActivityModule;
 import com.example.taxihelper.dagger.scope.ContextLife;
 import com.example.taxihelper.dagger.scope.PerActivity;
+import com.example.taxihelper.mvp.ui.activities.ChargeActivity;
 import com.example.taxihelper.mvp.ui.activities.CityChooseActivity;
 import com.example.taxihelper.mvp.ui.activities.LoginActivity;
 import com.example.taxihelper.mvp.ui.activities.ShenZhouTaxiActivity;
@@ -43,6 +44,9 @@ public interface ActivityComponent {
     void inject(LoginActivity loginActivity);
     void inject(ShenZhouTaxiActivity shenZhouTaxiActivity);
     void inject(CityChooseActivity cityChooseActivity);
+
+    void inject(ChargeActivity chargeActivity);
+    //    void inject(ChargeActivity chargeActivity);
 
 
 }

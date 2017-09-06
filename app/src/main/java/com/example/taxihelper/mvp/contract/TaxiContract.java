@@ -33,7 +33,7 @@ public interface TaxiContract {
         
         Observable<UserInfo> getUserInfo();
         
-        Observable<String> chargeAmount(Integer amount,String phoneNum);
+      
     }
 
     interface View extends BaseView {
@@ -64,6 +64,6 @@ public interface TaxiContract {
         
         void getUserInfo();
         
-        void chargeAmount(Integer amount,String phoneNum);
+       
     }
 }

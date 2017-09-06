@@ -167,32 +167,7 @@ public class TaxiPresenterImpl extends BasePresenterImpl<TaxiContract.View> impl
                 });
     }
 
-    @Override
-    public void chargeAmount(Integer amount, String phoneNum) {
-        mView.showProgress();
-        model.chargeAmount(amount,phoneNum)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new FilterSubscriber<String>() {
-                    @Override
-                    public void onCompleted() {
-
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        super.onError(e);
-                        mView.hideProgress();
-                        mView.showMsg(error);
-                    }
-
-                    @Override
-                    public void onNext(String str) {
-                        mView.hideProgress();
-                        mView.showMsg(str);
-                    }
-                });
-    }
+  
 
 
 }

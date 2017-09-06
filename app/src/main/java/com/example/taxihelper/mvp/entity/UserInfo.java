@@ -1,12 +1,13 @@
 package com.example.taxihelper.mvp.entity;
 
+
 /**
  * Created by 张兴锐 on 2017/8/25.
  */
 
 public class UserInfo {
-    
-
+   
+    private Long _id;
     private String accountBalance;
     private String companyAccountBalance;
     private int companyPayType;

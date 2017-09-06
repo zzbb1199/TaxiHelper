@@ -6,4 +6,9 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <string name="action_settings">Settings</string>
+    <string name="version">1.0</string>
+    <string name="about">关于我们</string>
+    <string name="about_msg">
+                            这是一款Material Design风格的打车比价App，采用MVP模式，基于Dagger2+RxJava+Retrofit2进行开发。\n项目指导：张兴锐，匡正泽\n项目成员：户因一,涂紫菱，牛雅可，吴林霜\n项目源码：https://github.com/zzbb1199/TaxiHelper\n主要用到的开源库：Dagger2、RxJava、Retrofit2、Butterknife、Greendao、PhotoView、Glide、Picasso…
+                            </string>
 </resources>

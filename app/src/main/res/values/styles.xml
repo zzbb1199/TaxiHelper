@@ -26,7 +26,7 @@
         <item name="android:textSize">@dimen/font_large</item>
     </style>
 
-    <style name="translucent" parent="NoactionBar">
+    <style name="FullScreen" parent="NoactionBar">
         <item name="android:windowFullscreen">true</item>
         <item name="android:windowBackground">@color/translucent_background</item>
         <item name="android:windowIsTranslucent">true</item>
@@ -40,6 +40,15 @@
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light"/>
+
+    <style name="charge_tv_style">
+        <item name="android:background">@drawable/tv_select</item>
+        <item name="android:textColor">@color/red_300</item>
+        <item name="android:textSize">@dimen/font_huge</item>
+        <item name="android:gravity">center</item>
+        <item name="android:layout_width">120dp</item>
+        <item name="android:layout_height">56dp</item>
+    </style>
 
     <!--<style name="CircularBarPagerStyle">-->
     <!--<item name="android:layout_height">match_parent</item>-->

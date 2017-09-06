@@ -4,7 +4,8 @@
     <color name="colorPrimaryDark">#C33433</color>
     <color name="colorAccent">#DB4C2F</color>
     <color name="touming">#00000000</color>
-    
+    <color name="tv_click">#D0DB4C3F</color>
+    <color name="item_background">#FAFAFA</color>
     
     <color name="primary_text">#212121</color>
     <color name="secondary_text">#757575</color>
