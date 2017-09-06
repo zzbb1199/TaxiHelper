@@ -30,4 +30,7 @@ public class DialogProgressUtils {
     public static void hideDialogProgress() {
         dialog.dismiss();
     }
+    public static void clear(){
+        dialog = null;
+    }
 }

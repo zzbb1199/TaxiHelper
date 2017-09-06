@@ -170,8 +170,8 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
     /**
      * 测试使用的数据
      */
-    private double testLocationLat = 39.166798;
-    private double testLocationLot = 117.397561;
+//    private double testLocationLat = 39.166798;
+//    private double testLocationLot = 117.397561;
 
     /**
      * presenter
@@ -196,27 +196,10 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
             //逆地址解析
             double lat = aMapLocation.getLatitude();
             double lot = aMapLocation.getLongitude();
-        
-            /**
-             * 测试
-             */
-            //    slat = testLocationLat;
-            //     slot = testLocationLot;
-            //     centerLocation = new LatLng(testLocationLat, testLocationLot);
-//            presenter.getCityInfo(testLocationLat, testLocationLot);
-//            presenter.getNearbyCarInfo(testLocationLat, testLocationLot);
-            
-            /**
-             * 下面为正规用法
-             */
-            /**.
-             * 正规
-             */
             slat = lat;
             slot = lot;
             presenter.getCityInfo(lat, lot);
             presenter.getNearbyCarInfo(lat, lot);
-            
             
             centerLocation = new LatLng(lat, lot);      
             myLatLng = centerLocation;
@@ -556,6 +539,7 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
         //将得到orderId，传入给下一个Activity
         Intent intent = new Intent(this, WaitingDriveAcceptActivity.class);
         intent.putExtra(Constant.ORDER_ID, createOrder.getOrderId());
+        adapter = null;
         startActivity(intent);
         finish();
     }
@@ -839,6 +823,8 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
         if (pw != null) {
             pw = null;//释放引用
         }
+        ActivityStack.getScreenManager().popActivity(this);
+        DialogProgressUtils.clear();
     }
 
     @Override
