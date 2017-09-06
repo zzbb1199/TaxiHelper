@@ -26,6 +26,7 @@ import com.example.taxihelper.mvp.ui.activities.ChargeActivity;
 import com.example.taxihelper.mvp.ui.activities.CityChooseActivity;
 import com.example.taxihelper.mvp.ui.activities.LoginActivity;
 import com.example.taxihelper.mvp.ui.activities.ShenZhouTaxiActivity;
+import com.example.taxihelper.mvp.ui.activities.WaitingDriveAcceptActivity;
 
 import dagger.Component;
 
@@ -46,6 +47,8 @@ public interface ActivityComponent {
     void inject(CityChooseActivity cityChooseActivity);
 
     void inject(ChargeActivity chargeActivity);
+
+    void inject(WaitingDriveAcceptActivity waitingDriveAcceptActivity);
     //    void inject(ChargeActivity chargeActivity);
 
 

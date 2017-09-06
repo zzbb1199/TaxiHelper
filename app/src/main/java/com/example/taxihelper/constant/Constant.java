@@ -59,4 +59,36 @@ public class Constant {
      * 订单
      */
     public static final String ORDER_ID = "order_id";
+
+
+    /**
+     * 测试接单司机
+     */
+    public static final long SHANGWU_DRIVER= 43851;
+    public static final long GONGWU_DRIVER = 42393;
+    public static final long HAOHUA_DRIVER = 44118;
+
+    /**
+     * 测试订单时选择的类型
+     */
+    public static final String SHANGWU_TYPE = "shangwu_type";
+    public static final String GONGWU_TYPE = "gongwu_type";
+    public static final String HAOHUA_TYPE = "haohua_type";
+
+    /**
+     * created > dispatched > arriving > arrived > serviceStarted > serviceFinished > feeSubmitted > paid > completed
+     */
+    public static final String ORDER_CREATED = "created";
+    public static final String ORDER_DISPATCHED = "dispatched";
+    public static final String ORDER_ARRIVING = "arriving";
+    public static final String ORDER_ARRIVED = "arrived";
+    public static final String ORDER_SERVICE_STARTED = "serviceStarted";
+    public static final String ORDER_SERVICE_FINISHED = "serviceFinished";
+    public static final String ORDER_FEE_SUBMITTED = "feeSubmitted";
+    public static final String ORDER_PAID = "paid";
+    public static final String ORRDER_COMPLEDTED = "completed";
+    public static final String [] ORDER_STATUS = new String[]{"dispatched","arriving","arrived",
+            "serviceStarted","serviceFinished","feeSubmitted","paid","completed"};
+    
+    
 }

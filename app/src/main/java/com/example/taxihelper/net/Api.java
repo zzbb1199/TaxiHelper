@@ -7,6 +7,7 @@ import com.example.taxihelper.mvp.entity.Data;
 import com.example.taxihelper.mvp.entity.GainAccessToken;
 import com.example.taxihelper.mvp.entity.NearbyCarInfo;
 import com.example.taxihelper.mvp.entity.OrderDetailInfo;
+import com.example.taxihelper.mvp.entity.OrderStatus;
 import com.example.taxihelper.mvp.entity.TaxiPriceInfo;
 import com.example.taxihelper.mvp.entity.UserInfo;
 
@@ -125,5 +126,14 @@ public interface Api {
     @POST("/v1/action/user/recharge")
     @FormUrlEncoded
     Observable<Data<String>> chargeAccount(@Field("access_token") String accessToken,@Field("amount") Integer amount,@Field("mobile") String phoneNum);
+
+    /**
+     * 模拟接单
+     */
+    @POST("/v1/action/order/changeStatus")
+    @FormUrlEncoded
+    Observable<Data<OrderStatus>> changOrderStatus(@Field("access_token") String accessToken,@Field("orderId") String orderId,
+                                                   @Field("driverId") long driverId,@Field("status") String status);
+    
 }
     

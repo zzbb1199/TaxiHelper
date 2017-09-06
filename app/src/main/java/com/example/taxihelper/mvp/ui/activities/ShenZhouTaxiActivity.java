@@ -172,7 +172,9 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
      */
 //    private double testLocationLat = 39.166798;
 //    private double testLocationLot = 117.397561;
-
+    public static final int GONGWU_TYPE_GROUP = 2;
+    public static final int SHANGWU_TYPE_GROUP =0;
+    public static final int HAOHUA_TYPE_GROUP = 7;
     /**
      * presenter
      */

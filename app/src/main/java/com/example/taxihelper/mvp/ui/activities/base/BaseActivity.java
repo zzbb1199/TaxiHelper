@@ -8,6 +8,9 @@ import com.example.taxihelper.App;
 import com.example.taxihelper.dagger.component.ActivityComponent;
 import com.example.taxihelper.dagger.component.DaggerActivityComponent;
 import com.example.taxihelper.dagger.module.ActivityModule;
+import com.example.taxihelper.mvp.BaseView;
+import com.example.taxihelper.utils.image.DialogProgressUtils;
+import com.example.taxihelper.utils.image.ToastUtil;
 import com.example.taxihelper.utils.system.ActivityStack;
 
 import butterknife.ButterKnife;
@@ -16,7 +19,7 @@ import butterknife.ButterKnife;
  * Created by 猿人 on 2017/4/9.
  */
 
-public abstract class BaseActivity extends AppCompatActivity {
+public abstract class BaseActivity extends AppCompatActivity implements BaseView{
 
     protected ActivityComponent mActivityComponent;
     protected String TAG;
@@ -67,5 +70,19 @@ public abstract class BaseActivity extends AppCompatActivity {
         super.onDestroy();
         ActivityStack.getScreenManager().popActivity(this);
         App.getRefWatcher().watch(this);
+    }
+    @Override
+    public void showProgress() {
+        DialogProgressUtils.ShowDialogProgress(this);
+    }
+
+    @Override
+    public void hideProgress() {
+        DialogProgressUtils.hideDialogProgress();
+    }
+
+    @Override
+    public void showMsg(String msg) {
+        ToastUtil.shortToast(msg);
     }
 }
