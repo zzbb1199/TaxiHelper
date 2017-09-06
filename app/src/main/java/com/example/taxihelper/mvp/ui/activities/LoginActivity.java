@@ -65,7 +65,7 @@ public class LoginActivity extends RxBusSubscriberBaseActivity implements GainAc
 
     @Override
     public void initRxBus() {
-        RxBus.getDefault().toObservable(String.class)
+        mSubscription = RxBus.getDefault().toObservable(String.class)
                 .subscribe(new Action1<String>() {
                     @Override
                     public void call(String s) {
@@ -119,4 +119,5 @@ public class LoginActivity extends RxBusSubscriberBaseActivity implements GainAc
         SpUtil.putString(this,Constant.EXPIRED_TIME, String.valueOf(expiredMills));
         ToActivityUtil.toNextActivityAndFinish(this,ShenZhouTaxiActivity.class);
     }
+    
 }

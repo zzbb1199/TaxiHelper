@@ -21,8 +21,8 @@ public class DialogProgressUtils {
     public static void ShowDialogProgressWithMsg(Context context,String msg){
         if (dialog == null) {
             dialog = new ProgressDialog(context);
-            dialog.setMessage(msg);
         }
+        dialog.setMessage(msg);
         dialog.show();
     }
 

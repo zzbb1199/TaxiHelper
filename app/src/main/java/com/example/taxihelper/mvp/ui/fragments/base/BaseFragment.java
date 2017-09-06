@@ -71,5 +71,6 @@ public abstract class BaseFragment extends Fragment {
         if (mSubsription != null && mSubsription.isUnsubscribed()) {
             mSubsription.unsubscribe();
         }
+        App.getRefWatcher().watch(this);
     }
 }

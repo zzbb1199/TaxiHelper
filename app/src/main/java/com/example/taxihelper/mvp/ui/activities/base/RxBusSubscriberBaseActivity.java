@@ -20,6 +20,7 @@ public abstract class RxBusSubscriberBaseActivity extends BaseActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         initRxBus();
+        
     }
 
     @Override

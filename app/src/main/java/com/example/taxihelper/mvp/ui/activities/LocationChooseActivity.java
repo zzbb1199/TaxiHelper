@@ -110,7 +110,7 @@ public class LocationChooseActivity extends RxBusSubscriberBaseActivity implemen
 
     @Override
     public void initRxBus() {
-        RxBus.getDefault().toObservable(CityChoose.class)
+        mSubscription =  RxBus.getDefault().toObservable(CityChoose.class)
                 .subscribe(new Action1<CityChoose>() {
                     @Override
                     public void call(CityChoose cityChoose) {

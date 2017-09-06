@@ -529,6 +529,7 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
     @Override
     public void showUserInfo(UserInfo userInfo) {
         Log.i(TAG, userInfo.toString());
+        App.getDaoSession().getUserInfoDao().insert(userInfo);
     }
 
     @TargetApi(Build.VERSION_CODES.M)

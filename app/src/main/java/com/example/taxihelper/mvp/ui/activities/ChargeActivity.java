@@ -1,9 +1,9 @@
 package com.example.taxihelper.mvp.ui.activities;
 
-import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 
+import com.example.taxihelper.App;
 import com.example.taxihelper.R;
 import com.example.taxihelper.mvp.contract.ChargeContract;
 import com.example.taxihelper.mvp.presenter.ChargePresenterImpl;
@@ -13,7 +13,6 @@ import com.example.taxihelper.utils.image.ToastUtil;
 
 import javax.inject.Inject;
 
-import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
 
@@ -39,7 +38,10 @@ public class ChargeActivity extends BaseActivity implements ChargeContract.View{
 
     @Override
     public void initViews() {
-
+        String phoneNum = App.getDaoSession().getUserInfoDao().loadAll().get(0).getPhone();
+        accountInput.setText(phoneNum+"");
+        //设置光标位置
+        accountInput.setSelection(phoneNum.length());
     }
 
     @Override
@@ -47,12 +49,7 @@ public class ChargeActivity extends BaseActivity implements ChargeContract.View{
         return R.layout.activity_charge;
     }
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        // TODO: add setContentView(...) invocation
-        ButterKnife.inject(this);
-    }
+
 
     @OnClick({R.id.ten_yuan, R.id.twenty_yuan, R.id.thirty_yuan, R.id.fifty_yuan, R.id.one_thousand_yuan, R.id.two_thousand_yuan})
     public void onViewClicked(View view) {
