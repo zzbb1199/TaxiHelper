@@ -8,7 +8,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.graphics.Point;
-import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -34,6 +33,10 @@ import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
+import com.amap.api.location.AMapLocation;
+import com.amap.api.location.AMapLocationClient;
+import com.amap.api.location.AMapLocationClientOption;
+import com.amap.api.location.AMapLocationListener;
 import com.amap.api.maps.AMap;
 import com.amap.api.maps.CameraUpdateFactory;
 import com.amap.api.maps.MapView;
@@ -91,11 +94,13 @@ import butterknife.InjectView;
 import butterknife.OnClick;
 import rx.functions.Action1;
 
+import static com.example.taxihelper.R.id.location;
+
 /**
  * Created by 张兴锐 on 2017/8/8.
  */
 
-public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContract.View, AMap.OnMyLocationChangeListener, GeocodeSearch.OnGeocodeSearchListener, AMap.OnCameraChangeListener, RouteSearch.OnRouteSearchListener, AMap.OnMapLoadedListener, NavigationView.OnNavigationItemSelectedListener {
+public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContract.View, GeocodeSearch.OnGeocodeSearchListener, AMap.OnCameraChangeListener, RouteSearch.OnRouteSearchListener, AMap.OnMapLoadedListener, NavigationView.OnNavigationItemSelectedListener {
 
 
     @InjectView(R.id.location_dot)
@@ -167,6 +172,7 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
      */
     private double testLocationLat = 39.166798;
     private double testLocationLot = 117.397561;
+
     /**
      * presenter
      */
@@ -179,6 +185,49 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
     MyLocationStyle myLocationStyle;
     GeocodeSearch geocodeSearch;
     MapView mMapView = null;
+    //声明AMapLocationClient类对象
+    public AMapLocationClient mLocationClient = null;
+    //声明定位回调监听器
+    public AMapLocationListener mLocationListener = new AMapLocationListener() {
+        @Override
+        public void onLocationChanged(AMapLocation aMapLocation) {
+            Log.i(TAG, aMapLocation.toString());
+            Log.i(TAG, "首次定位");
+            //逆地址解析
+            double lat = aMapLocation.getLatitude();
+            double lot = aMapLocation.getLongitude();
+        
+            /**
+             * 测试
+             */
+            //    slat = testLocationLat;
+            //     slot = testLocationLot;
+            //     centerLocation = new LatLng(testLocationLat, testLocationLot);
+//            presenter.getCityInfo(testLocationLat, testLocationLot);
+//            presenter.getNearbyCarInfo(testLocationLat, testLocationLot);
+            
+            /**
+             * 下面为正规用法
+             */
+            /**.
+             * 正规
+             */
+            slat = lat;
+            slot = lot;
+            presenter.getCityInfo(lat, lot);
+            presenter.getNearbyCarInfo(lat, lot);
+            
+            
+            centerLocation = new LatLng(lat, lot);      
+            myLatLng = centerLocation;
+            if (myLatLng != null) {
+                aMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myLatLng, nowZoom));//触发地图层移动，致使定位后续操作
+            }
+        
+            
+        }
+    };
+
 
     public void initInjector() {
         mActivityComponent.inject(this);
@@ -245,10 +294,13 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
 
     @TargetApi(Build.VERSION_CODES.M)
     public void initViews() {
+        /**
+         * view相关
+         */
         setSupportActionBar(mToolBar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
-//        mToolBar.setTitle("TaxiHelper");
-//        mToolBar.setTitleTextColor(Color.WHITE);
+        //        mToolBar.setTitle("TaxiHelper");
+        //        mToolBar.setTitleTextColor(Color.WHITE);
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, mToolBar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -258,7 +310,9 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-
+        /**
+         * 地图显示
+         */
         //初始化地图控制器对象
         if (aMap == null) {
             aMap = mMapView.getMap();
@@ -266,36 +320,63 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
 
         //定义定位方式
         myLocationStyle = new MyLocationStyle();//初始化定位蓝点样式类myLocationStyle.myLocationType(MyLocationStyle.LOCATION_TYPE_LOCATION_ROTATE);//连续定位、且将视角移动到地图中心点，定位点依照设备方向旋转，并且会跟随设备移动。（1秒1次定位）如果不设置myLocationType，默认也会执行此种模式。
-        myLocationStyle.interval(2000); //设置连续定位模式下的定位间隔，只在连续定位模式下生效，单次定位模式下不会生效。单位为毫秒。
-        myLocationStyle.myLocationType(MyLocationStyle.LOCATION_TYPE_LOCATE);//连续定位、且将视角移动到地图中心点，定位点依照设备方向旋转，并且会跟随设备移动。（1秒1次定位）默认执行此种模式。
-        //自定义定位图标
         ///////////////////////////////////
         myLocationStyle.strokeColor(getColor(R.color.touming));
         myLocationStyle.showMyLocation(false);
         myLocationStyle.radiusFillColor(getColor(R.color.touming));
         myLocationStyle.strokeWidth(0);
-        myLocationStyle.myLocationIcon(null);
-        //        BitmapDescriptor bm = BitmapDescriptorFactory.defaultMarker(HUE_RED);
-        //        myLocationStyle.myLocationIcon(bm);
 
         //设置默认定位按钮是否显示，非必需设置
         aMap.setMyLocationStyle(myLocationStyle);//设置定位蓝点的Style
-        aMap.setMyLocationEnabled(true);// 设置为true表示启动显示定位蓝点，false表示隐藏定位蓝点并不进行定位，默认是false。
+        aMap.setMyLocationEnabled(false);// 设置为true表示启动显示定位蓝点，false表示隐藏定位蓝点并不进行定位，默认是false。
 
         aMap.getUiSettings().setMyLocationButtonEnabled(false);
         aMap.getUiSettings().setZoomControlsEnabled(false);
         aMap.getUiSettings().setZoomGesturesEnabled(true);
         aMap.getUiSettings().setRotateGesturesEnabled(false);//禁止地图旋转手势
         aMap.getUiSettings().setTiltGesturesEnabled(false);//禁止倾斜手势
-        aMap.setOnMyLocationChangeListener(this);
         aMap.setOnMapLoadedListener(this);
         //设置当前定位级别
         aMap.moveCamera(CameraUpdateFactory.zoomTo(nowZoom));
         aMap.setOnCameraChangeListener(this);// 对amap添加移动地图事件监听器
+
+        /**
+         * 定图定位
+         */
+        //初始化定位
+        mLocationClient = new AMapLocationClient(getApplicationContext());
+        //设置定位回调监听
+        mLocationClient.setLocationListener(mLocationListener);
+        AMapLocationClientOption mLocationOption = new AMapLocationClientOption();
+        //设置定位模式为AMapLocationMode.Hight_Accuracy，高精度模式。
+        mLocationOption.setLocationMode(AMapLocationClientOption.AMapLocationMode.Hight_Accuracy);
+        //获取一次定位结果：
+        //获取最近3s内精度最高的一次定位结果：
+        //设置setOnceLocationLatest(boolean b)接口为true，启动定位时SDK会返回最近3s内精度最高的一次定位结果。如果设置其为true，setOnceLocation(boolean b)接口也会被设置为true，反之不会，默认为false。
+        mLocationOption.setOnceLocationLatest(true);
+        //设置是否返回地址信息（默认返回地址信息）
+        mLocationOption.setNeedAddress(true);
+        //设置是否允许模拟位置,默认为true，允许模拟位置
+        mLocationOption.setMockEnable(true);
+        //单位是毫秒，默认30000毫秒，建议超时时间不要低于8000毫秒。
+        mLocationOption.setHttpTimeOut(20000);
+        //给定位客户端对象设置定位参数
+        mLocationClient.setLocationOption(mLocationOption);
+        //启动定位
+        mLocationClient.startLocation();
+
+
+        /**
+         * 搜索
+         */
         //搜索功能初始化
         geocodeSearch = new GeocodeSearch(this);
         geocodeSearch.setOnGeocodeSearchListener(this);
 
+
+        /**
+         * view相关
+         */
         adapter = new TaxiResultInfoViewPager(getSupportFragmentManager());
         viewPager.setAdapter(adapter);
 
@@ -313,53 +394,6 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
         presenter.getUserInfo();
     }
 
-    /**
-     * 获取经纬度
-     *
-     * @param location
-     */
-
-
-    @Override
-    public void onMyLocationChange(Location location) {
-        Log.i(TAG, "首次定位");
-        //逆地址解析
-        double lat = location.getLatitude();
-        double lot = location.getLongitude();
-        /**.
-         * 正规
-         */
-        //        slat = lat;
-        //        slot = lot;
-        /**
-         * 测试
-         */
-        slat = testLocationLat;
-        slot = testLocationLot;
-        /**
-         * 下面为正规用法
-         */
-        //        centerLocation = new LatLng(lat, lot);
-        /**
-         * 为进行测试，下面为测试数据
-         */
-        centerLocation = new LatLng(testLocationLat, testLocationLot);
-        myLatLng = centerLocation;
-
-        if (myLatLng != null) {
-            aMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myLatLng, nowZoom));//触发地图层移动，致使定位后续操作
-        }
-        /**
-         * 正规写法
-         */
-        //        presenter.getCityInfo(lat, lot);
-        //        presenter.getNearbyCarInfo(lat, lot);
-        /**
-         * 测试数据
-         */
-        presenter.getCityInfo(testLocationLat, testLocationLot);
-        presenter.getNearbyCarInfo(testLocationLat, testLocationLot);
-    }
 
     /**
      * 坐标转文字
@@ -560,7 +594,7 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
     }
 
 
-    @OnClick({R.id.location_view, R.id.go_to_view, R.id.location, R.id.confirm_taxi, R.id.type_choose})
+    @OnClick({R.id.location_view, R.id.go_to_view, location, R.id.confirm_taxi, R.id.type_choose})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.location_view:
@@ -580,7 +614,7 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
                 intent2.putExtra(Constant.SERVICE_ID, choosedServiceId);
                 startActivity(intent2);
                 break;
-            case R.id.location:
+            case location:
                 if (myLatLng != null) {
                     aMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myLatLng, nowZoom));
                 }
@@ -834,17 +868,17 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        switch (id){
+        switch (id) {
             case R.id.charge_amount:
-                ToActivityUtil.toNextActivity(this,ChargeActivity.class);
+                ToActivityUtil.toNextActivity(this, ChargeActivity.class);
                 break;
             case R.id.history_order:
                 break;
             case R.id.team:
-                ToActivityUtil.toNextActivity(this,AboutTeamActivity.class);
+                ToActivityUtil.toNextActivity(this, AboutTeamActivity.class);
                 break;
             case R.id.author:
-                ToActivityUtil.toNextActivity(this,AboutUsActivity.class);
+                ToActivityUtil.toNextActivity(this, AboutUsActivity.class);
                 break;
         }
 
@@ -863,7 +897,5 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
         }
     }
 
-   
-    
 
 }

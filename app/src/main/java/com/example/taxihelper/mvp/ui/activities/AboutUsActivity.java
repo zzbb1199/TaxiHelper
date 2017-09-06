@@ -3,7 +3,6 @@ package com.example.taxihelper.mvp.ui.activities;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
 import android.view.View;
-import android.widget.Toolbar;
 
 import com.example.taxihelper.R;
 import com.example.taxihelper.mvp.ui.activities.base.BaseActivity;
@@ -21,7 +20,7 @@ public class AboutUsActivity extends BaseActivity {
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     public void initViews() {
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        android.support.v7.widget.Toolbar toolbar = (android.support.v7.widget.Toolbar) findViewById(R.id.toolbar);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
