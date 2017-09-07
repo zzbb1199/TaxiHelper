@@ -69,12 +69,13 @@ public class OrderDetailService extends Service implements OrderDetailContract.V
     }
 
     boolean isFirst = true;
-
+    boolean onLyOnce = true;
     @Override
     public void showOrderDetial(OrderDetailInfo orderDetailInfo) {
         //判定是否已经派单
         Log.i(TAG, orderDetailInfo.toString());
-        if (orderDetailInfo.getOrder().getStatus().equals(Constant.ORDER_DISPATCHED)) {
+        if (orderDetailInfo.getOrder().getStatus().equals(Constant.ORDER_DISPATCHED) && onLyOnce) {
+            onLyOnce = false;
             //如果已经有司机接单，那么就跳转页面
             RxBus.getDefault().post(orderDetailInfo);
             stopSelf();//结束掉
