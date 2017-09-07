@@ -18,7 +18,8 @@ public class DialogProgressUtils {
         }
         dialog.show();
     }
-    public static void ShowDialogProgressWithMsg(Context context,String msg){
+
+    public static void ShowDialogProgressWithMsg(Context context, String msg) {
         if (dialog == null) {
             dialog = new ProgressDialog(context);
         }
@@ -28,9 +29,12 @@ public class DialogProgressUtils {
 
 
     public static void hideDialogProgress() {
-        dialog.dismiss();
+        if (dialog != null) {
+            dialog.dismiss();
+        }
     }
-    public static void clear(){
+
+    public static void clear() {
         dialog = null;
     }
 }

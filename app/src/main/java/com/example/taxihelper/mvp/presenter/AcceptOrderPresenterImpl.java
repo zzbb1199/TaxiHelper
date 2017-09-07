@@ -84,7 +84,7 @@ public class AcceptOrderPresenterImpl extends BasePresenterImpl<AcceptOrderContr
 
     @Override
     public void cancelOrderReason() {
-        mView.hideProgress();
+        mView.showProgress();
         model.cancelOrderReason()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

@@ -1,12 +1,15 @@
 package com.example.taxihelper.mvp.entity;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.util.List;
 
 /**
  * Created by 张兴锐 on 2017/8/26.
  */
 
-public class OrderDetailInfo {
+public class OrderDetailInfo implements Parcelable {
 
 
     /**
@@ -43,7 +46,8 @@ public class OrderDetailInfo {
         this.price = price;
     }
 
-    public static class DriverBean {
+    public static class DriverBean implements Parcelable {
+        
         /**
          * driverLat : 0
          * driverLng : 0
@@ -127,9 +131,53 @@ public class OrderDetailInfo {
         public void setVehicleNo(String vehicleNo) {
             this.vehicleNo = vehicleNo;
         }
+
+        @Override
+        public int describeContents() {
+            return 0;
+        }
+
+        @Override
+        public void writeToParcel(Parcel dest, int flags) {
+            dest.writeDouble(this.driverLat);
+            dest.writeDouble(this.driverLng);
+            dest.writeString(this.driverName);
+            dest.writeString(this.virtualPhone4Purchaser);
+            dest.writeString(this.virtualPhone4Passenger);
+            dest.writeString(this.driverScore);
+            dest.writeString(this.vehicleModel);
+            dest.writeString(this.vehicleNo);
+        }
+
+        public DriverBean() {
+        }
+
+        protected DriverBean(Parcel in) {
+            this.driverLat = in.readDouble();
+            this.driverLng = in.readDouble();
+            this.driverName = in.readString();
+            this.virtualPhone4Purchaser = in.readString();
+            this.virtualPhone4Passenger = in.readString();
+            this.driverScore = in.readString();
+            this.vehicleModel = in.readString();
+            this.vehicleNo = in.readString();
+        }
+
+        public static final Creator<DriverBean> CREATOR = new Creator<DriverBean>() {
+            @Override
+            public DriverBean createFromParcel(Parcel source) {
+                return new DriverBean(source);
+            }
+
+            @Override
+            public DriverBean[] newArray(int size) {
+                return new DriverBean[size];
+            }
+        };
     }
 
-    public static class OrderBean {
+    public static class OrderBean implements Parcelable {
+        
         private boolean canDisagree;
         private long companyId;
         private int dispatchingCountdown;
@@ -468,7 +516,8 @@ public class OrderDetailInfo {
             this.status = status;
         }
 
-        public static class CustomDataBean {
+        public static class CustomDataBean implements Parcelable {
+            
             /**
              * dOrderId : 35456983384
              * dCouponId : 5462395218
@@ -502,10 +551,153 @@ public class OrderDetailInfo {
             public void setDCouponAmount(int dCouponAmount) {
                 this.dCouponAmount = dCouponAmount;
             }
+
+            @Override
+            public int describeContents() {
+                return 0;
+            }
+
+            @Override
+            public void writeToParcel(Parcel dest, int flags) {
+                dest.writeString(this.dOrderId);
+                dest.writeString(this.dCouponId);
+                dest.writeInt(this.dCouponAmount);
+            }
+
+            public CustomDataBean() {
+            }
+
+            protected CustomDataBean(Parcel in) {
+                this.dOrderId = in.readString();
+                this.dCouponId = in.readString();
+                this.dCouponAmount = in.readInt();
+            }
+
+            public static final Creator<CustomDataBean> CREATOR = new Creator<CustomDataBean>() {
+                @Override
+                public CustomDataBean createFromParcel(Parcel source) {
+                    return new CustomDataBean(source);
+                }
+
+                @Override
+                public CustomDataBean[] newArray(int size) {
+                    return new CustomDataBean[size];
+                }
+            };
         }
+
+        @Override
+        public int describeContents() {
+            return 0;
+        }
+
+        @Override
+        public void writeToParcel(Parcel dest, int flags) {
+            dest.writeByte(this.canDisagree ? (byte) 1 : (byte) 0);
+            dest.writeLong(this.companyId);
+            dest.writeInt(this.dispatchingCountdown);
+            dest.writeInt(this.rechargingCountdown);
+            dest.writeInt(this.autoPayTime);
+            dest.writeInt(this.carGroupId);
+            dest.writeInt(this.cityId);
+            dest.writeLong(this.createTime);
+            dest.writeString(this.customData);
+            dest.writeLong(this.departureTime);
+            dest.writeLong(this.dispatchedTime);
+            dest.writeDouble(this.elat);
+            dest.writeDouble(this.elng);
+            dest.writeString(this.endAddress);
+            dest.writeString(this.endName);
+            dest.writeString(this.employeeNumber);
+            dest.writeLong(this.finishedTime);
+            dest.writeString(this.id);
+            dest.writeByte(this.isDisagree ? (byte) 1 : (byte) 0);
+            dest.writeByte(this.isFixedPrice ? (byte) 1 : (byte) 0);
+            dest.writeByte(this.isDispatchedImmediately ? (byte) 1 : (byte) 0);
+            dest.writeString(this.number);
+            dest.writeString(this.orderRemark);
+            dest.writeInt(this.orderScore);
+            dest.writeString(this.passengerName);
+            dest.writeString(this.passengerMobile);
+            dest.writeString(this.paymentStatus);
+            dest.writeDouble(this.realElat);
+            dest.writeDouble(this.realElng);
+            dest.writeString(this.realEndAddress);
+            dest.writeString(this.realEndName);
+            dest.writeDouble(this.realSlat);
+            dest.writeDouble(this.realSlng);
+            dest.writeString(this.realStartAddress);
+            dest.writeString(this.realStartName);
+            dest.writeInt(this.serviceId);
+            dest.writeDouble(this.slat);
+            dest.writeDouble(this.slng);
+            dest.writeString(this.startAddress);
+            dest.writeString(this.startName);
+            dest.writeString(this.status);
+        }
+
+        public OrderBean() {
+        }
+
+        protected OrderBean(Parcel in) {
+            this.canDisagree = in.readByte() != 0;
+            this.companyId = in.readLong();
+            this.dispatchingCountdown = in.readInt();
+            this.rechargingCountdown = in.readInt();
+            this.autoPayTime = in.readInt();
+            this.carGroupId = in.readInt();
+            this.cityId = in.readInt();
+            this.createTime = in.readLong();
+            this.customData = in.readString();
+            this.departureTime = in.readLong();
+            this.dispatchedTime = in.readLong();
+            this.elat = in.readDouble();
+            this.elng = in.readDouble();
+            this.endAddress = in.readString();
+            this.endName = in.readString();
+            this.employeeNumber = in.readString();
+            this.finishedTime = in.readLong();
+            this.id = in.readString();
+            this.isDisagree = in.readByte() != 0;
+            this.isFixedPrice = in.readByte() != 0;
+            this.isDispatchedImmediately = in.readByte() != 0;
+            this.number = in.readString();
+            this.orderRemark = in.readString();
+            this.orderScore = in.readInt();
+            this.passengerName = in.readString();
+            this.passengerMobile = in.readString();
+            this.paymentStatus = in.readString();
+            this.realElat = in.readDouble();
+            this.realElng = in.readDouble();
+            this.realEndAddress = in.readString();
+            this.realEndName = in.readString();
+            this.realSlat = in.readDouble();
+            this.realSlng = in.readDouble();
+            this.realStartAddress = in.readString();
+            this.realStartName = in.readString();
+            this.serviceId = in.readInt();
+            this.slat = in.readDouble();
+            this.slng = in.readDouble();
+            this.startAddress = in.readString();
+            this.startName = in.readString();
+            this.status = in.readString();
+        }
+
+        public static final Creator<OrderBean> CREATOR = new Creator<OrderBean>() {
+            @Override
+            public OrderBean createFromParcel(Parcel source) {
+                return new OrderBean(source);
+            }
+
+            @Override
+            public OrderBean[] newArray(int size) {
+                return new OrderBean[size];
+            }
+        };
     }
 
-    public static class PriceBean {
+    public static class PriceBean implements Parcelable {
+        
 
         private String arrearsPrice;
         private int couponDeductibleAmount;
@@ -580,7 +772,8 @@ public class OrderDetailInfo {
             this.detail = detail;
         }
 
-        public static class DetailBean {
+        public static class DetailBean implements Parcelable {
+            
             /**
              * amount : 52
              * name : 起租价
@@ -604,7 +797,112 @@ public class OrderDetailInfo {
             public void setName(String name) {
                 this.name = name;
             }
-            
+
+            @Override
+            public int describeContents() {
+                return 0;
+            }
+
+            @Override
+            public void writeToParcel(Parcel dest, int flags) {
+                dest.writeString(this.amount);
+                dest.writeString(this.name);
+            }
+
+            public DetailBean() {
+            }
+
+            protected DetailBean(Parcel in) {
+                this.amount = in.readString();
+                this.name = in.readString();
+            }
+
+            public static final Creator<DetailBean> CREATOR = new Creator<DetailBean>() {
+                @Override
+                public DetailBean createFromParcel(Parcel source) {
+                    return new DetailBean(source);
+                }
+
+                @Override
+                public DetailBean[] newArray(int size) {
+                    return new DetailBean[size];
+                }
+            };
         }
+
+        @Override
+        public int describeContents() {
+            return 0;
+        }
+
+        @Override
+        public void writeToParcel(Parcel dest, int flags) {
+            dest.writeString(this.arrearsPrice);
+            dest.writeInt(this.couponDeductibleAmount);
+            dest.writeString(this.couponId);
+            dest.writeFloat(this.distance);
+            dest.writeFloat(this.duration);
+            dest.writeInt(this.equivalentPrice);
+            dest.writeString(this.totalPrice);
+            dest.writeTypedList(this.detail);
+        }
+
+        public PriceBean() {
+        }
+
+        protected PriceBean(Parcel in) {
+            this.arrearsPrice = in.readString();
+            this.couponDeductibleAmount = in.readInt();
+            this.couponId = in.readString();
+            this.distance = in.readFloat();
+            this.duration = in.readFloat();
+            this.equivalentPrice = in.readInt();
+            this.totalPrice = in.readString();
+            this.detail = in.createTypedArrayList(DetailBean.CREATOR);
+        }
+
+        public static final Creator<PriceBean> CREATOR = new Creator<PriceBean>() {
+            @Override
+            public PriceBean createFromParcel(Parcel source) {
+                return new PriceBean(source);
+            }
+
+            @Override
+            public PriceBean[] newArray(int size) {
+                return new PriceBean[size];
+            }
+        };
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeParcelable(this.driver, flags);
+        dest.writeParcelable(this.order, flags);
+        dest.writeParcelable(this.price, flags);
+    }
+
+   
+
+    protected OrderDetailInfo(Parcel in) {
+        this.driver = in.readParcelable(DriverBean.class.getClassLoader());
+        this.order = in.readParcelable(OrderBean.class.getClassLoader());
+        this.price = in.readParcelable(PriceBean.class.getClassLoader());
+    }
+
+    public static final Parcelable.Creator<OrderDetailInfo> CREATOR = new Parcelable.Creator<OrderDetailInfo>() {
+        @Override
+        public OrderDetailInfo createFromParcel(Parcel source) {
+            return new OrderDetailInfo(source);
+        }
+
+        @Override
+        public OrderDetailInfo[] newArray(int size) {
+            return new OrderDetailInfo[size];
+        }
+    };
 }
