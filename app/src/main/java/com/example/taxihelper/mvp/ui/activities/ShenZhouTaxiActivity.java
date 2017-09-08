@@ -1,13 +1,16 @@
 package com.example.taxihelper.mvp.ui.activities;
 
+import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
+import android.content.ComponentName;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.graphics.Point;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -59,6 +62,7 @@ import com.amap.api.services.route.RideRouteResult;
 import com.amap.api.services.route.RouteSearch;
 import com.amap.api.services.route.WalkRouteResult;
 import com.example.taxihelper.App;
+import com.example.taxihelper.BuildConfig;
 import com.example.taxihelper.R;
 import com.example.taxihelper.constant.Constant;
 import com.example.taxihelper.dagger.component.ActivityComponent;
@@ -79,7 +83,6 @@ import com.example.taxihelper.mvp.presenter.TaxiPresenterImpl;
 import com.example.taxihelper.mvp.ui.adapters.TaxiResultInfoViewPager;
 import com.example.taxihelper.mvp.ui.fragments.TaxiKindsFragment;
 import com.example.taxihelper.mvp.ui.service.OrderDetailService;
-import com.example.taxihelper.utils.image.DialogProgressUtils;
 import com.example.taxihelper.utils.image.ToastUtil;
 import com.example.taxihelper.utils.others.overlay.DrivingRouteOverlay;
 import com.example.taxihelper.utils.system.ActivityStack;
@@ -97,6 +100,12 @@ import javax.inject.Inject;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
+import permissions.dispatcher.NeedsPermission;
+import permissions.dispatcher.OnNeverAskAgain;
+import permissions.dispatcher.OnPermissionDenied;
+import permissions.dispatcher.OnShowRationale;
+import permissions.dispatcher.PermissionRequest;
+import permissions.dispatcher.RuntimePermissions;
 import rx.functions.Action1;
 
 import static com.example.taxihelper.R.id.location;
@@ -105,6 +114,7 @@ import static com.example.taxihelper.R.id.location;
  * Created by 张兴锐 on 2017/8/8.
  */
 
+@RuntimePermissions
 public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContract.View, GeocodeSearch.OnGeocodeSearchListener, AMap.OnCameraChangeListener, RouteSearch.OnRouteSearchListener, AMap.OnMapLoadedListener, NavigationView.OnNavigationItemSelectedListener, OrderDetailContract.View {
 
 
@@ -237,17 +247,12 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
         setContentView(getLayout());
         ButterKnife.inject(this);
         ActivityStack.getScreenManager().pushActivity(this);
-
-        initActivityComponent();
-        //初始化组件 注入器
-        initInjector();
         //获取地图控件引用
         mMapView = (MapView) findViewById(R.id.map);
         //在activity执行onCreate时执行mMapView.onCreate(savedInstanceState)，创建地图
         mMapView.onCreate(savedInstanceState);
-        initViews();
-        initRxBus();
-        initRouteSearch();
+        getLocationPermission();
+
     }
 
 
@@ -507,12 +512,12 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
 
     @Override
     public void showProgress() {
-        DialogProgressUtils.ShowDialogProgress(this);
+//        DialogProgressUtils.ShowDialogProgress(this);
     }
 
     @Override
     public void hideProgress() {
-        DialogProgressUtils.hideDialogProgress();
+//        DialogProgressUtils.hideDialogProgress();
     }
 
     @Override
@@ -556,7 +561,6 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
 
     @Override
     public void showUserInfo(UserInfo userInfo) {
-        Log.i(TAG, userInfo.toString());
         App.getDaoSession().getUserInfoDao().insert(userInfo);
     }
 
@@ -568,7 +572,7 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
         //        }
         if (goingOrder != null && goingOrder.size() != 0) {
             Log.i("正在进行的订单", goingOrder.toString());
-            DialogProgressUtils.ShowDialogProgressWithMsg(this, "发现您有正在进行中的订单，正在为您跳转...");
+//            DialogProgressUtils.ShowDialogProgressWithMsg(this, "发现您有正在进行中的订单，正在为您跳转...");
             //如果订单存在，请求具体订单
             OrderDetailPresenterImpl presenter = new OrderDetailPresenterImpl();
             presenter.injectView(this);
@@ -658,12 +662,13 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
      *
      * @param nearbyCarInfo
      */
+    AlertDialog dialog;
     @Override
     public void showNearbyCarInfo(NearbyCarInfo nearbyCarInfo) {
         Log.i(TAG, nearbyCarInfo.toString());
         if (nearbyCarInfo.getNumber() == 0) {
             //如果附近没有车辆，提示用户
-            new AlertDialog.Builder(this)
+            dialog =  new AlertDialog.Builder(this)
                     .setTitle("提示")
                     .setMessage("很遗憾，附近没有可乘车辆，请换个地方试试")
                     .setPositiveButton("确定", new DialogInterface.OnClickListener() {
@@ -671,7 +676,8 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
                         public void onClick(DialogInterface dialogInterface, int i) {
                             dialogInterface.dismiss();
                         }
-                    }).show();
+                    }).create();
+            dialog.show();
         } else {
             //根据各车的经纬度，在地图上显示
             for (NearbyCarInfo.CarListBean car : nearbyCarInfo.getCarList()) {
@@ -844,6 +850,7 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
     /*********************************************************************************************/
     @Override
     protected void onDestroy() {
+        Log.i(TAG,"Destory");
         super.onDestroy();
         //在activity执行onDestroy时执行mMapView.onDestroy()，销毁地图
         mMapView.onDestroy();
@@ -851,9 +858,14 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
             pw = null;//释放引用
         }
         ActivityStack.getScreenManager().popActivity(this);
-        DialogProgressUtils.clear();
+        if (dialog != null &&  dialog.isShowing()){
+            dialog.dismiss();
+            dialog = null;
+        }
+//        DialogProgressUtils.clear();
+     
     }
-
+    
     @Override
     protected void onResume() {
         super.onResume();
@@ -922,8 +934,145 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
         Intent intent1 = new Intent(this, WaitingDriverArriveActivity.class);
         intent1.putExtra(Constant.ORDER_DETAIL_INFO, orderDetailInfo);
         startActivity(intent1);
-        DialogProgressUtils.hideDialogProgress();
+//        DialogProgressUtils.hideDialogProgress();
         finish();//结束
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.i(TAG,"onStop");
+//        DialogProgressUtils.hideDialogProgress();
+//        DialogProgressUtils.clear();
+    }
+
+    private void getLocationPermission() {
+        ShenZhouTaxiActivityPermissionsDispatcher.locationNeedsWithCheck(this);
+    }
+
+    @NeedsPermission({Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION})
+    void locationNeeds() {
+        //        ToastUtil.shortToast("成功授权");
+        Log.i(TAG, "成功授权");
+        initActivityComponent();
+        //初始化组件 注入器
+        initInjector();
+        initViews();
+        initRxBus();
+        initRouteSearch();
+    }
+    
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        ShenZhouTaxiActivityPermissionsDispatcher.onRequestPermissionsResult(this, requestCode, grantResults);
+        //拒绝的时候
+        Log.i(TAG, "result");
+    }
+
+    @OnShowRationale({Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION})
+    void locationOnShow(final PermissionRequest request) {
+        Log.i(TAG, "show");
+        new AlertDialog.Builder(this)
+                .setTitle("提示")
+                .setMessage("使用本软件需要定位权限")
+                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                        request.proceed();
+                    }
+                }).setNegativeButton("算了吧", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
+                request.cancel();
+            }
+        }).show();
+    }
+
+    @OnPermissionDenied({Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION})
+    void locationDenied() {
+        Log.i(TAG, "拒绝");
+        ToastUtil.shortToast("您取消了授权，程序将无法使用");
+        finish();
+    }
+
+
+    @OnNeverAskAgain({Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION})
+    void locationDeniedForever() {
+        Log.i(TAG, "永久jude");
+        new AlertDialog.Builder(this)
+                .setTitle("提示")
+                .setMessage("您未授予定位权限，这将导致本软件无法使用，请您主动授予")
+                .setCancelable(false)
+                .setPositiveButton("好的", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                        gotoMiuiPermission();
+                    }
+                }).setNegativeButton("算了", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
+                ToastUtil.shortToast("您取消了授权，程序将无法使用");
+                finish();
+            }
+        }).show();
+    }
+
+    private void gotoMiuiPermission() {
+        Intent i = new Intent("miui.intent.action.APP_PERM_EDITOR");
+        ComponentName componentName = new ComponentName("com.miui.securitycenter", "com.miui.permcenter.permissions.AppPermissionsEditorActivity");
+        i.setComponent(componentName);
+        i.putExtra("extra_pkgname", getPackageName());
+        try {
+            startActivity(i);
+        } catch (Exception e) {
+            e.printStackTrace();
+            gotoMeizuPermission();
+        }
+    }
+
+    private void gotoMeizuPermission() {
+        Intent intent = new Intent("com.meizu.safe.security.SHOW_APPSEC");
+        intent.addCategory(Intent.CATEGORY_DEFAULT);
+        intent.putExtra("packageName", BuildConfig.APPLICATION_ID);
+        try {
+            startActivity(intent);
+        } catch (Exception e) {
+            e.printStackTrace();
+            gotoHuaweiPermission();
+        }
+    }
+
+    private void gotoHuaweiPermission() {
+        try {
+            Intent intent = new Intent();
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            ComponentName comp = new ComponentName("com.huawei.systemmanager", "com.huawei.permissionmanager.ui.MainActivity");//华为权限管理
+            intent.setComponent(comp);
+            startActivity(intent);
+        } catch (Exception e) {
+            e.printStackTrace();
+            startActivity(getAppDetailSettingIntent());
+        }
+
+    }
+
+    private Intent getAppDetailSettingIntent() {
+        Intent localIntent = new Intent();
+        localIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        if (Build.VERSION.SDK_INT >= 9) {
+            localIntent.setAction("android.settings.APPLICATION_DETAILS_SETTINGS");
+            localIntent.setData(Uri.fromParts("package", getPackageName(), null));
+        } else if (Build.VERSION.SDK_INT <= 8) {
+            localIntent.setAction(Intent.ACTION_VIEW);
+            localIntent.setClassName("com.android.settings", "com.android.settings.InstalledAppDetails");
+            localIntent.putExtra("com.android.settings.ApplicationPkgName", getPackageName());
+        }
+        return localIntent;
+    }
 }

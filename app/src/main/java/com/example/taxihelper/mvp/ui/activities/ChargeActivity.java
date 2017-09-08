@@ -8,7 +8,6 @@ import com.example.taxihelper.R;
 import com.example.taxihelper.mvp.contract.ChargeContract;
 import com.example.taxihelper.mvp.presenter.ChargePresenterImpl;
 import com.example.taxihelper.mvp.ui.activities.base.BaseActivity;
-import com.example.taxihelper.utils.image.DialogProgressUtils;
 import com.example.taxihelper.utils.image.ToastUtil;
 
 import javax.inject.Inject;
@@ -88,12 +87,12 @@ public class ChargeActivity extends BaseActivity implements ChargeContract.View{
 
     @Override
     public void showProgress() {
-        DialogProgressUtils.ShowDialogProgressWithMsg(this,"正在为您充值，请稍后...");
+//        DialogProgressUtils.ShowDialogProgressWithMsg(this,"正在为您充值，请稍后...");
     }
 
     @Override
     public void hideProgress() {
-        DialogProgressUtils.hideDialogProgress();
+//        DialogProgressUtils.hideDialogProgress();
     }
 
     @Override

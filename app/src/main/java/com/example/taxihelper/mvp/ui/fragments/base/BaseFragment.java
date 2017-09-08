@@ -12,7 +12,6 @@ import com.example.taxihelper.dagger.component.DaggerFragmentComponent;
 import com.example.taxihelper.dagger.component.FragmentComponent;
 import com.example.taxihelper.dagger.module.FragmentModule;
 import com.example.taxihelper.mvp.BaseView;
-import com.example.taxihelper.utils.image.DialogProgressUtils;
 import com.example.taxihelper.utils.image.ToastUtil;
 
 import butterknife.ButterKnife;
@@ -79,12 +78,12 @@ public abstract class BaseFragment extends Fragment implements BaseView{
 
     @Override
     public void showProgress() {
-        DialogProgressUtils.ShowDialogProgress(getContext());
+//        DialogProgressUtils.ShowDialogProgress(getContext());
     }
 
     @Override
     public void hideProgress() {
-        DialogProgressUtils.hideDialogProgress();
+//        DialogProgressUtils.hideDialogProgress();
     }
 
     @Override

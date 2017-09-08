@@ -9,7 +9,6 @@ import com.example.taxihelper.dagger.component.ActivityComponent;
 import com.example.taxihelper.dagger.component.DaggerActivityComponent;
 import com.example.taxihelper.dagger.module.ActivityModule;
 import com.example.taxihelper.mvp.BaseView;
-import com.example.taxihelper.utils.image.DialogProgressUtils;
 import com.example.taxihelper.utils.image.ToastUtil;
 import com.example.taxihelper.utils.system.ActivityStack;
 
@@ -73,12 +72,12 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseView
     }
     @Override
     public void showProgress() {
-        DialogProgressUtils.ShowDialogProgress(this);
+//        DialogProgressUtils.ShowDialogProgress(this);
     }
 
     @Override
     public void hideProgress() {
-        DialogProgressUtils.hideDialogProgress();
+//        DialogProgressUtils.hideDialogProgress();
     }
 
     @Override

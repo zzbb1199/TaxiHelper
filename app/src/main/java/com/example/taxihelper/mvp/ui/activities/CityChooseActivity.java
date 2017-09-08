@@ -13,10 +13,9 @@ import com.example.taxihelper.mvp.presenter.GetCitiesInfoPresenterImpl;
 import com.example.taxihelper.mvp.ui.activities.base.BaseActivity;
 import com.example.taxihelper.mvp.ui.adapters.CityChooseContentAdapter;
 import com.example.taxihelper.mvp.ui.adapters.CityChooseHeaderAdapter;
-import com.example.taxihelper.utils.image.DialogProgressUtils;
-import com.example.taxihelper.utils.others.AccessTokenUtils;
 import com.example.taxihelper.utils.image.EasyRecyViewInitUtils;
 import com.example.taxihelper.utils.image.ToastUtil;
+import com.example.taxihelper.utils.others.AccessTokenUtils;
 import com.example.taxihelper.utils.system.DensityUtil;
 import com.example.taxihelper.utils.system.RxBus;
 import com.example.taxihelper.widget.DividerDecoration;
@@ -91,12 +90,12 @@ public class CityChooseActivity extends BaseActivity implements GetCitiesInfoCon
 
     @Override
     public void showProgress() {
-        DialogProgressUtils.ShowDialogProgress(this);
+//        DialogProgressUtils.ShowDialogProgress(this);
     }
 
     @Override
     public void hideProgress() {
-        DialogProgressUtils.hideDialogProgress();
+//        DialogProgressUtils.hideDialogProgress();
     }
 
     @Override
