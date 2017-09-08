@@ -11,6 +11,8 @@ import com.example.taxihelper.mvp.model.TaxiModelImpl;
 import com.example.taxihelper.mvp.presenter.base.BasePresenterImpl;
 import com.example.taxihelper.net.FilterSubscriber;
 
+import java.util.List;
+
 import javax.inject.Inject;
 
 import rx.android.schedulers.AndroidSchedulers;
@@ -173,7 +175,7 @@ public class TaxiPresenterImpl extends BasePresenterImpl<TaxiContract.View> impl
         model.checkGoingOrder()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new FilterSubscriber<GoingOrder>() {
+                .subscribe(new FilterSubscriber<List<GoingOrder>>() {
                     @Override
                     public void onCompleted() {
                         
@@ -186,7 +188,7 @@ public class TaxiPresenterImpl extends BasePresenterImpl<TaxiContract.View> impl
                     }
 
                     @Override
-                    public void onNext(GoingOrder goingOrder) {
+                    public void onNext(List<GoingOrder> goingOrder) {
                         mView.showGoingOrderResult(goingOrder);
                     }
                 });

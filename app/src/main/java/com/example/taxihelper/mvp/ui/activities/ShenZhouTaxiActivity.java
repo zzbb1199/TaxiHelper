@@ -105,7 +105,7 @@ import static com.example.taxihelper.R.id.location;
  * Created by 张兴锐 on 2017/8/8.
  */
 
-public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContract.View, GeocodeSearch.OnGeocodeSearchListener, AMap.OnCameraChangeListener, RouteSearch.OnRouteSearchListener, AMap.OnMapLoadedListener, NavigationView.OnNavigationItemSelectedListener,OrderDetailContract.View {
+public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContract.View, GeocodeSearch.OnGeocodeSearchListener, AMap.OnCameraChangeListener, RouteSearch.OnRouteSearchListener, AMap.OnMapLoadedListener, NavigationView.OnNavigationItemSelectedListener, OrderDetailContract.View {
 
 
     @InjectView(R.id.location_dot)
@@ -175,10 +175,10 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
     /**
      * 测试使用的数据
      */
-//    private double testLocationLat = 39.166798;
-//    private double testLocationLot = 117.397561;
+    //    private double testLocationLat = 39.166798;
+    //    private double testLocationLot = 117.397561;
     public static final int GONGWU_TYPE_GROUP = 2;
-    public static final int SHANGWU_TYPE_GROUP =0;
+    public static final int SHANGWU_TYPE_GROUP = 0;
     public static final int HAOHUA_TYPE_GROUP = 7;
     /**
      * presenter
@@ -207,14 +207,14 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
             slot = lot;
             presenter.getCityInfo(lat, lot);
             presenter.getNearbyCarInfo(lat, lot);
-            
-            centerLocation = new LatLng(lat, lot);      
+
+            centerLocation = new LatLng(lat, lot);
             myLatLng = centerLocation;
             if (myLatLng != null) {
                 aMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myLatLng, nowZoom));//触发地图层移动，致使定位后续操作
             }
-        
-            
+
+
         }
     };
 
@@ -380,6 +380,7 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
         initDatas();
         //价差是否存在已有订单
         presenter.checkGoingOrder();
+
     }
 
     private void initDatas() {
@@ -559,17 +560,21 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
         App.getDaoSession().getUserInfoDao().insert(userInfo);
     }
 
-    
+
     @Override
-    public void showGoingOrderResult(GoingOrder goingOrder) {
-//        if (goingOrder.getOrderStatus().equals(Constant.ORDER_DISPATCHED)){
-//            //如果有订单存在
-//        }
-        DialogProgressUtils.ShowDialogProgressWithMsg(this,"发现您有正在进行中的订单，正在为您跳转...");
-        //如果订单存在，请求具体订单
-        OrderDetailPresenterImpl presenter = new OrderDetailPresenterImpl();
-        presenter.injectView(this);
-        presenter.getOrderDetialInfo(goingOrder.getOrderId());
+    public void showGoingOrderResult(List<GoingOrder> goingOrder) {
+        //        if (goingOrder.getOrderStatus().equals(Constant.ORDER_DISPATCHED)){
+        //            //如果有订单存在
+        //        }
+        if (goingOrder != null && goingOrder.size() != 0) {
+            Log.i("正在进行的订单", goingOrder.toString());
+            DialogProgressUtils.ShowDialogProgressWithMsg(this, "发现您有正在进行中的订单，正在为您跳转...");
+            //如果订单存在，请求具体订单
+            OrderDetailPresenterImpl presenter = new OrderDetailPresenterImpl();
+            presenter.injectView(this);
+            presenter.getOrderDetialInfo(goingOrder.get(0).getOrderId());
+        }
+
     }
 
     @TargetApi(Build.VERSION_CODES.M)
@@ -881,7 +886,7 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
                 ToActivityUtil.toNextActivity(this, ChargeActivity.class);
                 break;
             case R.id.history_order:
-                ToActivityUtil.toNextActivity(this,HistoryOrderActivity.class);
+                ToActivityUtil.toNextActivity(this, HistoryOrderActivity.class);
                 break;
             case R.id.team:
                 ToActivityUtil.toNextActivity(this, AboutTeamActivity.class);
@@ -911,14 +916,14 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
     public void showOrderDetial(OrderDetailInfo orderDetailInfo) {
         //一旦请求成功，开启服务
         Intent intent = new Intent(this, OrderDetailService.class);
-        intent.putExtra(Constant.ORDER_ID,orderDetailInfo.getOrder().getId());//传入orderid
+        intent.putExtra(Constant.ORDER_ID, orderDetailInfo.getOrder().getId());//传入orderid
         startService(intent);
         //同时调转Activity
-        Intent intent1 = new Intent(this,WaitingDriverArriveActivity.class);
-        intent1.putExtra(Constant.ORDER_DETAIL_INFO,orderDetailInfo);
+        Intent intent1 = new Intent(this, WaitingDriverArriveActivity.class);
+        intent1.putExtra(Constant.ORDER_DETAIL_INFO, orderDetailInfo);
         startActivity(intent1);
         DialogProgressUtils.hideDialogProgress();
         finish();//结束
     }
-    
+
 }

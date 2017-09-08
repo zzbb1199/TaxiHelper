@@ -6,6 +6,18 @@ package com.example.taxihelper.mvp.entity;
 
 public class GoingOrder {
 
+    @Override
+    public String toString() {
+        return "GoingOrder{" +
+                "elat=" + elat +
+                ", elng=" + elng +
+                ", orderId='" + orderId + '\'' +
+                ", orderNo='" + orderNo + '\'' +
+                ", orderStatus='" + orderStatus + '\'' +
+                ", slat=" + slat +
+                ", slng=" + slng +
+                '}';
+    }
 
     /**
      * elat : 39.135483

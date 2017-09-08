@@ -9,6 +9,8 @@ import com.example.taxihelper.mvp.entity.TaxiPriceInfo;
 import com.example.taxihelper.mvp.entity.UserInfo;
 import com.example.taxihelper.mvp.model.base.BaseModelImpl;
 
+import java.util.List;
+
 import javax.inject.Inject;
 
 import rx.Observable;
@@ -57,7 +59,7 @@ public class TaxiModelImpl extends BaseModelImpl implements TaxiContract.Model {
     }
 
     @Override
-    public Observable<GoingOrder> checkGoingOrder() {
+    public Observable<List<GoingOrder>> checkGoingOrder() {
         return filterStatus(getApi().checkGoingOrder(accessToken));
     }
 

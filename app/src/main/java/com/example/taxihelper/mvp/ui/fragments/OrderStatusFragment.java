@@ -27,6 +27,7 @@ public class OrderStatusFragment extends RxBusBaseFragment {
                 .subscribe(new Action1<CurrentOrderStatus>() {
                     @Override
                     public void call(CurrentOrderStatus currentOrderStatus) {
+                        Log.i(TAG,"状态更该");
                         String status = currentOrderStatus.getCurrentOrderStauts();
                         if (status.equals(Constant.ORDER_ARRIVING)) {
                             //车辆赶来中

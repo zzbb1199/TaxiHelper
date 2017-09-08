@@ -9,6 +9,8 @@ import com.example.taxihelper.mvp.entity.TaxiPriceInfo;
 import com.example.taxihelper.mvp.entity.UserInfo;
 import com.example.taxihelper.mvp.presenter.base.BasePresenter;
 
+import java.util.List;
+
 import rx.Observable;
 
 /**
@@ -34,7 +36,7 @@ public interface TaxiContract {
         
         Observable<UserInfo> getUserInfo();
         
-        Observable<GoingOrder> checkGoingOrder();
+        Observable<List<GoingOrder>> checkGoingOrder();
       
     }
 
@@ -49,7 +51,7 @@ public interface TaxiContract {
         
         void showUserInfo(UserInfo userInfo);
         
-        void showGoingOrderResult(GoingOrder goingOrder);
+        void showGoingOrderResult(List<GoingOrder> goingOrder);
     }
 
     interface Presenter extends BasePresenter {

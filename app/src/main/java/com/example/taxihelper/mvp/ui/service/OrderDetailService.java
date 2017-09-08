@@ -49,6 +49,7 @@ public class OrderDetailService extends Service implements OrderDetailContract.V
         orderId = intent.getStringExtra(Constant.ORDER_ID);
         if (orderId != null) {
             presenter.getOrderDetialInfo(orderId);
+            Log.i(TAG, "启动监听Service");
         }
         return super.onStartCommand(intent, flags, startId);
     }
@@ -82,7 +83,7 @@ public class OrderDetailService extends Service implements OrderDetailContract.V
     @Override
     public void showOrderDetial(OrderDetailInfo orderDetailInfo) {
         //判定是否已经派单
-        Log.i(TAG, orderDetailInfo.toString());
+        Log.i(TAG, "监听收到");
         String status = orderDetailInfo.getOrder().getStatus();
         if (status.equals(Constant.ORDER_DISPATCHED) && b1) {
             b1 = false;
@@ -96,34 +97,35 @@ public class OrderDetailService extends Service implements OrderDetailContract.V
             //车辆已经成功到达
             b3 = false;
             RxBus.getDefault().post(new CurrentOrderStatus(Constant.ORDER_ARRIVED));
-        } else if (status.equals(Constant.ORDER_SERVICE_STARTED)&& b4) {
+        } else if (status.equals(Constant.ORDER_SERVICE_STARTED) && b4) {
             //开始
             b4 = false;
             RxBus.getDefault().post(new CurrentOrderStatus(Constant.ORDER_SERVICE_STARTED));
-        } else if (status.equals(Constant.ORDER_SERVICE_FINISHED)&& b5) {
+        } else if (status.equals(Constant.ORDER_SERVICE_FINISHED) && b5) {
             //结束
             b5 = false;
             RxBus.getDefault().post(new CurrentOrderStatus(Constant.ORDER_SERVICE_FINISHED));
-        } else if (status.equals(Constant.ORDER_FEE_SUBMITTED)&& b6) {
+        } else if (status.equals(Constant.ORDER_FEE_SUBMITTED) && b6) {
             //提交费用
             b6 = false;
             RxBus.getDefault().post(new CurrentOrderStatus(Constant.ORDER_FEE_SUBMITTED));
-        } else if (status.equals(Constant.ORDER_PAID)&& b7){
+        } else if (status.equals(Constant.ORDER_PAID) && b7) {
             //支付
             b7 = false;
             RxBus.getDefault().post(new CurrentOrderStatus(Constant.ORDER_PAID));
-        }else if (status.equals(Constant.ORRDER_COMPLEDTED)&& b8){
+        } else if (status.equals(Constant.ORRDER_COMPLEDTED) && b8) {
             //完成整个流程
             b8 = false;
             RxBus.getDefault().post(new CurrentOrderStatus(Constant.ORRDER_COMPLEDTED));
             //一旦完成所有流程
             stopSelf();
             return;
-        }else if (isFirst) {
-                //否则，开始计时
-                timeCount.start();
-                isFirst = false;
-            }
+        }
+        if (isFirst) {
+            //否则，开始计时
+            timeCount.start();
+            isFirst = false;
+        }
 
     }
 

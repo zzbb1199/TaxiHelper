@@ -157,7 +157,7 @@ public interface Api {
     Observable<Data<HistoryOrder>> getHistroyOrder(@Query("access_token")String accessToken,@Query("limit") Integer limit,@Query("orderStatus") String orderStatus);
     
     @GET("/v1/resource/order/current")
-    Observable<Data<GoingOrder>> checkGoingOrder(@Query("access_token") String access_token);
+    Observable<Data<List<GoingOrder>>> checkGoingOrder(@Query("access_token") String access_token);
     
     @POST("/v1/action/order/comment")
     @FormUrlEncoded
