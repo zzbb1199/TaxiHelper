@@ -14,8 +14,8 @@ public class DialogProgressUtils {
     public static void ShowDialogProgress(Context context) {
         if (dialog == null) {
             dialog = new ProgressDialog(context);
-            dialog.setMessage("加载中...");
         }
+        dialog.setMessage("加载中...");
         dialog.show();
     }
 

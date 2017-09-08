@@ -9,6 +9,7 @@ import android.util.Log;
 
 import com.example.taxihelper.constant.Constant;
 import com.example.taxihelper.mvp.contract.OrderDetailContract;
+import com.example.taxihelper.mvp.entity.CurrentOrderStatus;
 import com.example.taxihelper.mvp.entity.NoDriverAccept;
 import com.example.taxihelper.mvp.entity.OrderDetailInfo;
 import com.example.taxihelper.mvp.presenter.OrderDetailPresenterImpl;
@@ -46,7 +47,7 @@ public class OrderDetailService extends Service implements OrderDetailContract.V
     public int onStartCommand(Intent intent, int flags, int startId) {
         TAG = getClass().getSimpleName();
         orderId = intent.getStringExtra(Constant.ORDER_ID);
-        if (orderId != null){
+        if (orderId != null) {
             presenter.getOrderDetialInfo(orderId);
         }
         return super.onStartCommand(intent, flags, startId);
@@ -69,23 +70,60 @@ public class OrderDetailService extends Service implements OrderDetailContract.V
     }
 
     boolean isFirst = true;
-    boolean onLyOnce = true;
+    boolean b1 = true;
+    boolean b2 = true;
+    boolean b3 = true;
+    boolean b4 = true;
+    boolean b5 = true;
+    boolean b6 = true;
+    boolean b7 = true;
+    boolean b8 = true;
+
     @Override
     public void showOrderDetial(OrderDetailInfo orderDetailInfo) {
         //判定是否已经派单
         Log.i(TAG, orderDetailInfo.toString());
-        if (orderDetailInfo.getOrder().getStatus().equals(Constant.ORDER_DISPATCHED) && onLyOnce) {
-            onLyOnce = false;
+        String status = orderDetailInfo.getOrder().getStatus();
+        if (status.equals(Constant.ORDER_DISPATCHED) && b1) {
+            b1 = false;
             //如果已经有司机接单，那么就跳转页面
             RxBus.getDefault().post(orderDetailInfo);
-            stopSelf();//结束掉
+        } else if (status.equals(Constant.ORDER_ARRIVING) && b2) {
+            //车辆赶来中
+            b2 = false;
+            RxBus.getDefault().post(new CurrentOrderStatus(Constant.ORDER_ARRIVING));
+        } else if (status.equals(Constant.ORDER_ARRIVED) && b3) {
+            //车辆已经成功到达
+            b3 = false;
+            RxBus.getDefault().post(new CurrentOrderStatus(Constant.ORDER_ARRIVED));
+        } else if (status.equals(Constant.ORDER_SERVICE_STARTED)&& b4) {
+            //开始
+            b4 = false;
+            RxBus.getDefault().post(new CurrentOrderStatus(Constant.ORDER_SERVICE_STARTED));
+        } else if (status.equals(Constant.ORDER_SERVICE_FINISHED)&& b5) {
+            //结束
+            b5 = false;
+            RxBus.getDefault().post(new CurrentOrderStatus(Constant.ORDER_SERVICE_FINISHED));
+        } else if (status.equals(Constant.ORDER_FEE_SUBMITTED)&& b6) {
+            //提交费用
+            b6 = false;
+            RxBus.getDefault().post(new CurrentOrderStatus(Constant.ORDER_FEE_SUBMITTED));
+        } else if (status.equals(Constant.ORDER_PAID)&& b7){
+            //支付
+            b7 = false;
+            RxBus.getDefault().post(new CurrentOrderStatus(Constant.ORDER_PAID));
+        }else if (status.equals(Constant.ORRDER_COMPLEDTED)&& b8){
+            //完成整个流程
+            b8 = false;
+            RxBus.getDefault().post(new CurrentOrderStatus(Constant.ORRDER_COMPLEDTED));
+            //一旦完成所有流程
+            stopSelf();
             return;
-        }
-        if (isFirst) {
-            //否则，开始计时
-            timeCount.start();
-            isFirst = false;
-        }
+        }else if (isFirst) {
+                //否则，开始计时
+                timeCount.start();
+                isFirst = false;
+            }
 
     }
 

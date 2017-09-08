@@ -11,13 +11,16 @@ import com.example.taxihelper.App;
 import com.example.taxihelper.dagger.component.DaggerFragmentComponent;
 import com.example.taxihelper.dagger.component.FragmentComponent;
 import com.example.taxihelper.dagger.module.FragmentModule;
+import com.example.taxihelper.mvp.BaseView;
+import com.example.taxihelper.utils.image.DialogProgressUtils;
+import com.example.taxihelper.utils.image.ToastUtil;
 
 import butterknife.ButterKnife;
 import rx.Subscription;
 
 
 
-public abstract class BaseFragment extends Fragment {
+public abstract class BaseFragment extends Fragment implements BaseView{
 
     protected FragmentComponent mFragmentComponent;
     protected Subscription mSubsription;
@@ -72,5 +75,20 @@ public abstract class BaseFragment extends Fragment {
             mSubsription.unsubscribe();
         }
         App.getRefWatcher().watch(this);
+    }
+
+    @Override
+    public void showProgress() {
+        DialogProgressUtils.ShowDialogProgress(getContext());
+    }
+
+    @Override
+    public void hideProgress() {
+        DialogProgressUtils.hideDialogProgress();
+    }
+
+    @Override
+    public void showMsg(String msg) {
+        ToastUtil.shortToast(msg);
     }
 }

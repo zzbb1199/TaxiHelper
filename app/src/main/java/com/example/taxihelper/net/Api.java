@@ -7,6 +7,7 @@ import com.example.taxihelper.mvp.entity.CityInfo;
 import com.example.taxihelper.mvp.entity.CreateOrder;
 import com.example.taxihelper.mvp.entity.Data;
 import com.example.taxihelper.mvp.entity.GainAccessToken;
+import com.example.taxihelper.mvp.entity.GoingOrder;
 import com.example.taxihelper.mvp.entity.HistoryOrder;
 import com.example.taxihelper.mvp.entity.NearbyCarInfo;
 import com.example.taxihelper.mvp.entity.OrderDetailInfo;
@@ -154,5 +155,13 @@ public interface Api {
     
     @GET("/v1/resource/order/history")
     Observable<Data<HistoryOrder>> getHistroyOrder(@Query("access_token")String accessToken,@Query("limit") Integer limit,@Query("orderStatus") String orderStatus);
+    
+    @GET("/v1/resource/order/current")
+    Observable<Data<GoingOrder>> checkGoingOrder(@Query("access_token") String access_token);
+    
+    @POST("/v1/action/order/comment")
+    @FormUrlEncoded
+    Observable<String> commentOrder(@Field("access_token") String accessToken,
+                                    @Field("score") Integer score,@Field("remark") String remark);
 }
     

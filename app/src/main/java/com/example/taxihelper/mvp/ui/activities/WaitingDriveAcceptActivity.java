@@ -22,6 +22,7 @@ import com.example.taxihelper.mvp.presenter.AcceptOrderPresenterImpl;
 import com.example.taxihelper.mvp.ui.activities.base.RxBusSubscriberBaseActivity;
 import com.example.taxihelper.mvp.ui.service.OrderDetailService;
 import com.example.taxihelper.utils.image.ToastUtil;
+import com.example.taxihelper.utils.system.DensityUtil;
 import com.example.taxihelper.utils.system.RxBus;
 
 import java.util.List;
@@ -47,7 +48,7 @@ public class WaitingDriveAcceptActivity extends RxBusSubscriberBaseActivity impl
     @Inject
     AcceptOrderPresenterImpl presenter;
     int count = 0;//总共9个流程
-    public final String STATUS[] = new String[]{"正在为您分配", "车辆正在赶来", "车辆已到达，请上车", "服务开始", "服务结束", "提交费用中", "已完成支付", "本次乘车已结束"};
+    public final String STATUS[] = new String[]{"正在为您分配", "系统已为您成功派单，正在跳转...", "车辆已到达，请上车", "服务开始", "服务结束", "提交费用中", "已完成支付", "本次乘车已结束"};
 
     @Override
     public void initInjector() {
@@ -87,8 +88,9 @@ public class WaitingDriveAcceptActivity extends RxBusSubscriberBaseActivity impl
 
                         Log.i(TAG, orderDetailInfo.toString());
                         Intent intent = new Intent(WaitingDriveAcceptActivity.this,WaitingDriverArriveActivity.class);
-                        intent.putExtra("orderDetailInfo",orderDetailInfo);
+                        intent.putExtra(Constant.ORDER_DETAIL_INFO,orderDetailInfo);
                         startActivity(intent);
+                        finish();
                     }
                 });
         RxBus.getDefault().toObservable(NoDriverAccept.class)
@@ -129,8 +131,9 @@ public class WaitingDriveAcceptActivity extends RxBusSubscriberBaseActivity impl
         //得到reason后，
         LinearLayout container = (LinearLayout) inflater.inflate(R.layout.dialog_cancel_reason, null);
         for (CancelOrderReason reason : cancelOrderReason) {
-            View view = inflater.inflate(R.layout.cancel_reason_item, null);
-            final TextView tv = view.findViewById(R.id.reason_item);
+            final TextView tv = (TextView) inflater.inflate(R.layout.cancel_reason_item, null);
+            int dp8 = DensityUtil.dip2px(this,8);
+            tv.setPadding(dp8,dp8,dp8,dp8);
             tv.setText(reason.getValue());
             tv.setTag(reason.getId());
             tv.setOnClickListener(new View.OnClickListener() {
@@ -140,7 +143,7 @@ public class WaitingDriveAcceptActivity extends RxBusSubscriberBaseActivity impl
                     dialog.dismiss();
                 }
             });
-            container.addView(view);
+            container.addView(tv);
         }
         dialog = new AlertDialog.Builder(this)
                 .setView(container)

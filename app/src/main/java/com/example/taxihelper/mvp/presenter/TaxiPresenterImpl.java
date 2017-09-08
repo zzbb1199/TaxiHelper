@@ -3,6 +3,7 @@ package com.example.taxihelper.mvp.presenter;
 import com.example.taxihelper.mvp.contract.TaxiContract;
 import com.example.taxihelper.mvp.entity.CityInfo;
 import com.example.taxihelper.mvp.entity.CreateOrder;
+import com.example.taxihelper.mvp.entity.GoingOrder;
 import com.example.taxihelper.mvp.entity.NearbyCarInfo;
 import com.example.taxihelper.mvp.entity.TaxiPriceInfo;
 import com.example.taxihelper.mvp.entity.UserInfo;
@@ -167,7 +168,29 @@ public class TaxiPresenterImpl extends BasePresenterImpl<TaxiContract.View> impl
                 });
     }
 
-  
+    @Override
+    public void checkGoingOrder() {
+        model.checkGoingOrder()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new FilterSubscriber<GoingOrder>() {
+                    @Override
+                    public void onCompleted() {
+                        
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        super.onError(e);
+                        mView.showMsg(error);
+                    }
+
+                    @Override
+                    public void onNext(GoingOrder goingOrder) {
+                        mView.showGoingOrderResult(goingOrder);
+                    }
+                });
+    }
 
 
 }

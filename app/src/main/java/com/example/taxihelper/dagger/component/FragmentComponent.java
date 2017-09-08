@@ -22,6 +22,7 @@ import android.content.Context;
 import com.example.taxihelper.dagger.module.FragmentModule;
 import com.example.taxihelper.dagger.scope.ContextLife;
 import com.example.taxihelper.dagger.scope.PerFragment;
+import com.example.taxihelper.mvp.ui.fragments.CommentFragment;
 
 import dagger.Component;
 
@@ -36,5 +37,6 @@ public interface FragmentComponent {
     Context getApplicationContext();
 
     Activity getActivity();
-
+    
+    void inject(CommentFragment commentFragment);
 }

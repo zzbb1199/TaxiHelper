@@ -3,6 +3,7 @@ package com.example.taxihelper.mvp.contract;
 import com.example.taxihelper.mvp.BaseView;
 import com.example.taxihelper.mvp.entity.CityInfo;
 import com.example.taxihelper.mvp.entity.CreateOrder;
+import com.example.taxihelper.mvp.entity.GoingOrder;
 import com.example.taxihelper.mvp.entity.NearbyCarInfo;
 import com.example.taxihelper.mvp.entity.TaxiPriceInfo;
 import com.example.taxihelper.mvp.entity.UserInfo;
@@ -33,6 +34,7 @@ public interface TaxiContract {
         
         Observable<UserInfo> getUserInfo();
         
+        Observable<GoingOrder> checkGoingOrder();
       
     }
 
@@ -46,6 +48,8 @@ public interface TaxiContract {
         void showCreateOrderResult(CreateOrder createOrder);
         
         void showUserInfo(UserInfo userInfo);
+        
+        void showGoingOrderResult(GoingOrder goingOrder);
     }
 
     interface Presenter extends BasePresenter {
@@ -63,7 +67,8 @@ public interface TaxiContract {
                           double elat,double elot,String estimateId);
         
         void getUserInfo();
-        
+
+        void checkGoingOrder();
        
     }
 }

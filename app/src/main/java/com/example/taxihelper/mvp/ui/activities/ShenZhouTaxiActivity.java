@@ -64,16 +64,21 @@ import com.example.taxihelper.constant.Constant;
 import com.example.taxihelper.dagger.component.ActivityComponent;
 import com.example.taxihelper.dagger.component.DaggerActivityComponent;
 import com.example.taxihelper.dagger.module.ActivityModule;
+import com.example.taxihelper.mvp.contract.OrderDetailContract;
 import com.example.taxihelper.mvp.contract.TaxiContract;
 import com.example.taxihelper.mvp.entity.CityInfo;
 import com.example.taxihelper.mvp.entity.CreateOrder;
+import com.example.taxihelper.mvp.entity.GoingOrder;
 import com.example.taxihelper.mvp.entity.LocationChoose;
 import com.example.taxihelper.mvp.entity.NearbyCarInfo;
+import com.example.taxihelper.mvp.entity.OrderDetailInfo;
 import com.example.taxihelper.mvp.entity.TaxiPriceInfo;
 import com.example.taxihelper.mvp.entity.UserInfo;
+import com.example.taxihelper.mvp.presenter.OrderDetailPresenterImpl;
 import com.example.taxihelper.mvp.presenter.TaxiPresenterImpl;
 import com.example.taxihelper.mvp.ui.adapters.TaxiResultInfoViewPager;
 import com.example.taxihelper.mvp.ui.fragments.TaxiKindsFragment;
+import com.example.taxihelper.mvp.ui.service.OrderDetailService;
 import com.example.taxihelper.utils.image.DialogProgressUtils;
 import com.example.taxihelper.utils.image.ToastUtil;
 import com.example.taxihelper.utils.others.overlay.DrivingRouteOverlay;
@@ -100,7 +105,7 @@ import static com.example.taxihelper.R.id.location;
  * Created by 张兴锐 on 2017/8/8.
  */
 
-public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContract.View, GeocodeSearch.OnGeocodeSearchListener, AMap.OnCameraChangeListener, RouteSearch.OnRouteSearchListener, AMap.OnMapLoadedListener, NavigationView.OnNavigationItemSelectedListener {
+public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContract.View, GeocodeSearch.OnGeocodeSearchListener, AMap.OnCameraChangeListener, RouteSearch.OnRouteSearchListener, AMap.OnMapLoadedListener, NavigationView.OnNavigationItemSelectedListener,OrderDetailContract.View {
 
 
     @InjectView(R.id.location_dot)
@@ -373,6 +378,8 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
         pw.setFocusable(true);
 
         initDatas();
+        //价差是否存在已有订单
+        presenter.checkGoingOrder();
     }
 
     private void initDatas() {
@@ -550,6 +557,19 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
     public void showUserInfo(UserInfo userInfo) {
         Log.i(TAG, userInfo.toString());
         App.getDaoSession().getUserInfoDao().insert(userInfo);
+    }
+
+    
+    @Override
+    public void showGoingOrderResult(GoingOrder goingOrder) {
+//        if (goingOrder.getOrderStatus().equals(Constant.ORDER_DISPATCHED)){
+//            //如果有订单存在
+//        }
+        DialogProgressUtils.ShowDialogProgressWithMsg(this,"发现您有正在进行中的订单，正在为您跳转...");
+        //如果订单存在，请求具体订单
+        OrderDetailPresenterImpl presenter = new OrderDetailPresenterImpl();
+        presenter.injectView(this);
+        presenter.getOrderDetialInfo(goingOrder.getOrderId());
     }
 
     @TargetApi(Build.VERSION_CODES.M)
@@ -887,4 +907,18 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
     }
 
 
+    @Override
+    public void showOrderDetial(OrderDetailInfo orderDetailInfo) {
+        //一旦请求成功，开启服务
+        Intent intent = new Intent(this, OrderDetailService.class);
+        intent.putExtra(Constant.ORDER_ID,orderDetailInfo.getOrder().getId());//传入orderid
+        startService(intent);
+        //同时调转Activity
+        Intent intent1 = new Intent(this,WaitingDriverArriveActivity.class);
+        intent1.putExtra(Constant.ORDER_DETAIL_INFO,orderDetailInfo);
+        startActivity(intent1);
+        DialogProgressUtils.hideDialogProgress();
+        finish();//结束
+    }
+    
 }

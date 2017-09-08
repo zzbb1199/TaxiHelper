@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="8dp"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/list_item_height"
+        android:layout_gravity="center"
+        android:background="@color/white"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:layout_marginLeft="16dp"
+            android:gravity="center"
+            android:text="评分:"
+            android:textSize="@dimen/font_normal"/>
+
+        <com.eugeneek.smilebar.SmileBar
+            android:id="@+id/starBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginLeft="8dp"
+            app:enabled="true"
+            app:horizontalSpacing="8dp"
+            app:rating="4"
+            app:smileDefault="@drawable/none"
+            app:smileHeight="30dp"
+            app:smileRate1="@drawable/one"
+            app:smileRate2="@drawable/two"
+            app:smileRate3="@drawable/three"
+            app:smileRate4="@drawable/four"
+            app:smileRate5="@drawable/five"
+            app:smileWidth="30dp"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@color/white"
+        android:orientation="vertical"
+        android:paddingLeft="16dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="8dp"
+            android:gravity="start"
+            android:text="评价:"
+            android:textSize="@dimen/font_normal"/>
+
+        <include
+            layout="@layout/view_normal_divider"
+            ></include>
+
+        <EditText
+            android:id="@+id/remark_input"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:layout_marginTop="8dp"
+            android:background="@null"
+            android:gravity="start"
+            android:hint="写点东西吧..."
+            android:textSize="@dimen/font_normal"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:gravity="center"
+        android:padding="8dp"
+        android:weightSum="1">
+
+        <Button
+            android:id="@+id/comment_finish"
+            android:layout_width="0dp"
+            android:layout_height="36dp"
+            android:layout_weight="0.6"
+            android:background="@drawable/bt_bg"
+            android:text="完成"
+            android:textColor="@color/white"
+            android:textSize="@dimen/font_large"/>
+    </LinearLayout>
+
+
+</LinearLayout>
