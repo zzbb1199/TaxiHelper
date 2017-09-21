@@ -85,7 +85,6 @@ public class WaitingDriveAcceptActivity extends RxBusSubscriberBaseActivity impl
                     public void call(OrderDetailInfo orderDetailInfo) {
                         //得到信息后，传给下一个Activity
                         //成功有人接单
-
                         Log.i(TAG, orderDetailInfo.toString());
                         Intent intent = new Intent(WaitingDriveAcceptActivity.this,WaitingDriverArriveActivity.class);
                         intent.putExtra(Constant.ORDER_DETAIL_INFO,orderDetailInfo);

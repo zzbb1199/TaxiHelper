@@ -76,6 +76,7 @@ import com.example.taxihelper.mvp.entity.GoingOrder;
 import com.example.taxihelper.mvp.entity.LocationChoose;
 import com.example.taxihelper.mvp.entity.NearbyCarInfo;
 import com.example.taxihelper.mvp.entity.OrderDetailInfo;
+import com.example.taxihelper.mvp.entity.RefreshMoney;
 import com.example.taxihelper.mvp.entity.TaxiPriceInfo;
 import com.example.taxihelper.mvp.entity.UserInfo;
 import com.example.taxihelper.mvp.presenter.OrderDetailPresenterImpl;
@@ -155,6 +156,8 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
     LinearLayout mainContainer;
     private LinearLayout typeLinear;
     private PopupWindow pw;
+    private TextView nameTv;
+    private TextView overMoney;
 
 
     /**
@@ -284,6 +287,14 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
 
                     }
                 });
+        RxBus.getDefault().toObservable(RefreshMoney.class)
+                .subscribe(new Action1<RefreshMoney>() {
+                    @Override
+                    public void call(RefreshMoney refreshMoney) {
+                        String money = App.getDaoSession().getUserInfoDao().loadAll().get(0).getAccountBalance();
+                        overMoney.setText("余额:"+money);
+                    }
+                });
     }
 
 
@@ -303,6 +314,9 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        View header = navigationView.inflateHeaderView(R.layout.nav_header_main);
+        nameTv = header.findViewById(R.id.name);
+        overMoney = header.findViewById(R.id.overage_money);
         navigationView.setNavigationItemSelectedListener(this);
 
         /**
@@ -561,7 +575,12 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
 
     @Override
     public void showUserInfo(UserInfo userInfo) {
+
+        App.getDaoSession().getUserInfoDao().deleteAll();
         App.getDaoSession().getUserInfoDao().insert(userInfo);
+
+        overMoney.setText("余额:" + userInfo.getAccountBalance());
+        nameTv.setText("账户:"+userInfo.getPhone());
     }
 
 

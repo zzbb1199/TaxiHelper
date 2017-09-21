@@ -12,7 +12,9 @@ import com.example.taxihelper.R;
 import com.example.taxihelper.constant.Constant;
 import com.example.taxihelper.mvp.contract.CommentContract;
 import com.example.taxihelper.mvp.presenter.CommentPresenterImpl;
+import com.example.taxihelper.mvp.ui.activities.ShenZhouTaxiActivity;
 import com.example.taxihelper.mvp.ui.fragments.base.BaseFragment;
+import com.example.taxihelper.utils.system.ToActivityUtil;
 
 import javax.inject.Inject;
 
@@ -93,7 +95,7 @@ public class CommentFragment extends BaseFragment implements CommentContract.Vie
     @Override
     public void showMsg(String msg) {
         super.showMsg(msg);
-        getActivity().finish();
+        ToActivityUtil.toNextActivityAndFinish(getContext(), ShenZhouTaxiActivity.class);
     }
 
     @OnClick(R.id.comment_finish)

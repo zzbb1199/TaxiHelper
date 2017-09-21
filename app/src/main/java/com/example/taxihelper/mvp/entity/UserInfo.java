@@ -40,6 +40,8 @@ public class UserInfo {
     @Unique
     private String uninvoiceAmount;
 
+    
+    
     @Generated(hash = 2123167421)
     public UserInfo(Long _id, String accountBalance, String companyAccountBalance,
             int companyPayType, int companyQuotaType, String companyRemainAmount,
@@ -63,7 +65,25 @@ public class UserInfo {
 
     @Generated(hash = 1279772520)
     public UserInfo() {
+        
     }
+    public void refreshUserInfo(UserInfo userInfo){
+        this._id = userInfo._id;
+        this.accountBalance = userInfo.accountBalance;
+        this.companyAccountBalance = userInfo.companyAccountBalance;
+        this.companyPayType = userInfo.companyPayType;
+        this.companyQuotaType = userInfo.companyQuotaType;
+        this.companyRemainAmount = userInfo.companyRemainAmount;
+        this.payType = userInfo.payType;
+        this.email = userInfo.email;
+        this.id = userInfo.id;
+        this.name = userInfo.name;
+        this.phone = userInfo.phone;
+        this.picture = userInfo.picture;
+        this.sex = userInfo.sex;
+        this.uninvoiceAmount = userInfo.uninvoiceAmount;
+    }
+    
 
     public String getAccountBalance() {
         return accountBalance;

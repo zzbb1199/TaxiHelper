@@ -6,9 +6,12 @@ import android.widget.EditText;
 import com.example.taxihelper.App;
 import com.example.taxihelper.R;
 import com.example.taxihelper.mvp.contract.ChargeContract;
+import com.example.taxihelper.mvp.entity.RefreshMoney;
+import com.example.taxihelper.mvp.entity.UserInfo;
 import com.example.taxihelper.mvp.presenter.ChargePresenterImpl;
 import com.example.taxihelper.mvp.ui.activities.base.BaseActivity;
 import com.example.taxihelper.utils.image.ToastUtil;
+import com.example.taxihelper.utils.system.RxBus;
 
 import javax.inject.Inject;
 
@@ -28,6 +31,8 @@ public class ChargeActivity extends BaseActivity implements ChargeContract.View{
 
     @InjectView(R.id.account_input)
     EditText accountInput;
+    
+    String chargeMoney;
     
     @Override
     public void initInjector() {
@@ -65,20 +70,26 @@ public class ChargeActivity extends BaseActivity implements ChargeContract.View{
         switch (view.getId()) {
             case R.id.ten_yuan:
                 amount = 10;
+                chargeMoney = "10";
                 break;
             case R.id.twenty_yuan:
+                chargeMoney = "20";
                 amount = 20;
                 break;
             case R.id.thirty_yuan:
+                chargeMoney = "30";
                 amount = 30; 
                 break;
             case R.id.fifty_yuan:
+                chargeMoney = "50";
                 amount = 50;
                 break;
             case R.id.one_thousand_yuan:
+                chargeMoney = "100";
                 amount = 100;
                 break;
             case R.id.two_thousand_yuan:
+                chargeMoney = "200";
                 amount = 200;
                 break;
         }
@@ -102,6 +113,11 @@ public class ChargeActivity extends BaseActivity implements ChargeContract.View{
 
     @Override
     public void success() {
+        UserInfo user = App.getDaoSession().getUserInfoDao().loadAll().get(0);
+        Integer totoalMoney = Integer.parseInt(user.getAccountBalance())+Integer.parseInt(chargeMoney);
+        user.setAccountBalance(totoalMoney+"");
+        App.getDaoSession().getUserInfoDao().update(user);
+        RxBus.getDefault().post(new RefreshMoney());
         finish();
     }
 }
