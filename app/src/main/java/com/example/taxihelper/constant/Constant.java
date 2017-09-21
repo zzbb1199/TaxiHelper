@@ -30,6 +30,10 @@ public class Constant {
     public static final String SHENZHOUE_REDIRECT_URL = "http://nmid.cqupt.edu.cn/";
 
     /**
+     * 电话号码
+     */
+    public static final String PHONE_NUM = "phone_number";
+    /**
      * 字符串
      */
     public static final String ACCESS_TOKEN = "access_token";

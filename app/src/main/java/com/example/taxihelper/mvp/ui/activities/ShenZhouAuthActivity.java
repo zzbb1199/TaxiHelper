@@ -9,6 +9,7 @@ import android.webkit.WebViewClient;
 import com.example.taxihelper.R;
 import com.example.taxihelper.constant.Constant;
 import com.example.taxihelper.mvp.ui.activities.base.BaseActivity;
+import com.example.taxihelper.utils.image.ToastUtil;
 import com.example.taxihelper.utils.system.RxBus;
 import com.example.taxihelper.utils.system.SpUtil;
 
@@ -23,8 +24,8 @@ public class ShenZhouAuthActivity extends BaseActivity {
     WebView mWebView;
 
     String url = Constant.SHENZHOU_TEST_AUTH + "/oauth/authorize?client_id=" + Constant.SHENZHOU_CLIENT_ID +
-            "&redirect_uri=" + Constant.SHENZHOUE_REDIRECT_URL + "&response_type=code&scope=read&mobile=15086943358";
-
+            "&redirect_uri=" + Constant.SHENZHOUE_REDIRECT_URL + "&response_type=code&scope=read&mobile=";
+    String phoneNum = null;
     @Override
     public void initInjector() {
 
@@ -32,7 +33,12 @@ public class ShenZhouAuthActivity extends BaseActivity {
 
     @Override
     public void initViews() {
-
+        phoneNum = getIntent().getStringExtra(Constant.PHONE_NUM);
+        if (phoneNum == null){
+            ToastUtil.shortToast("出错了");
+            finish();
+        }
+        url = url+phoneNum;
         WebSettings webSettings = mWebView.getSettings();
         //支持JS
         webSettings.setJavaScriptEnabled(true);
@@ -55,7 +61,7 @@ public class ShenZhouAuthActivity extends BaseActivity {
                 count += 1;
                 Log.i(TAG, count + "");
                 
-                if (url.equals("client_id=A73371C10000030A&redirect_uri=http://nmid.cqupt.edu.cn/&response_type=code&scope=read&mobile=15086943358")){
+                if (url.equals("client_id=A73371C10000030A&redirect_uri=http://nmid.cqupt.edu.cn/&response_type=code&scope=read&mobile="+phoneNum)){
                     //如果得到了如上所示的url，
                     String accessToken = SpUtil.getString(ShenZhouAuthActivity.this,Constant.ACCESS_TOKEN,null);
                     if (accessToken != null){
