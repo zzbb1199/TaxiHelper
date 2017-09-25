@@ -37,12 +37,13 @@
 
                 <ImageView
                     android:id="@+id/app_logo"
-                    android:layout_width="120dp"
-                    android:layout_height="120dp"
+                    android:layout_width="110dp"
+                    android:layout_height="110dp"
+                    android:layout_alignParentTop="true"
                     android:layout_centerHorizontal="true"
-                    android:layout_margin="16dp"
+                    android:layout_marginTop="16dp"
                     android:contentDescription="@string/app_name"
-                    android:src="@drawable/location_marker"/>
+                    android:src="@drawable/logo"/>
 
                 <TextView
                     android:id="@+id/app_name"
@@ -62,7 +63,7 @@
                     android:layout_centerHorizontal="true"
                     android:text="@string/version"
                     android:textColor="@color/white"
-                   />
+                    />
 
             </RelativeLayout>
 

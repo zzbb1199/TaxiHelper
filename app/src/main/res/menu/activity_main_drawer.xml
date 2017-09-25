@@ -32,5 +32,14 @@
                 android:title="作者"/>
         </menu>
     </item>
+    <item android:title="其他">
+        <menu>
+            <item
+                android:icon="@drawable/log_off"
+                android:id="@+id/log_off"
+                android:title="注销登录"
+                />
+        </menu>
+    </item>
 
 </menu>

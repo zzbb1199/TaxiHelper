@@ -28,7 +28,7 @@
     <application
         android:name=".App"
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/logo"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
@@ -58,6 +58,8 @@
           android:theme="@style/NoactionBar"
             ></activity>
         <activity android:name=".mvp.ui.activities.HistoryOrderActivity"></activity>
+        <activity android:name=".mvp.ui.activities.SplashActivity"/>
+
         <service android:name=".mvp.ui.service.OrderDetailService"></service>
         <meta-data
             android:name="com.amap.api.v2.apikey"

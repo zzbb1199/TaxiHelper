@@ -19,6 +19,7 @@ import android.support.annotation.RequiresApi;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
@@ -89,6 +90,7 @@ import com.example.taxihelper.utils.others.overlay.DrivingRouteOverlay;
 import com.example.taxihelper.utils.system.ActivityStack;
 import com.example.taxihelper.utils.system.DensityUtil;
 import com.example.taxihelper.utils.system.RxBus;
+import com.example.taxihelper.utils.system.SpUtil;
 import com.example.taxihelper.utils.system.ToActivityUtil;
 import com.example.taxihelper.widget.CircleView;
 
@@ -154,6 +156,8 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
     ImageView typeChoose;
     @InjectView(R.id.main_container)
     LinearLayout mainContainer;
+    @InjectView(R.id.location)
+    ImageView locationBt;
     private LinearLayout typeLinear;
     private PopupWindow pw;
     private TextView nameTv;
@@ -225,11 +229,14 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
             myLatLng = centerLocation;
             if (myLatLng != null) {
                 aMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myLatLng, nowZoom));//触发地图层移动，致使定位后续操作
+                //定位完成，设置
+                locationBt.setImageDrawable(getResources().getDrawable(R.drawable.has_location, null));
             }
 
 
         }
     };
+    private boolean backToOrigin = true;
 
 
     public void initInjector() {
@@ -292,7 +299,7 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
                     @Override
                     public void call(RefreshMoney refreshMoney) {
                         String money = App.getDaoSession().getUserInfoDao().loadAll().get(0).getAccountBalance();
-                        overMoney.setText("余额:"+money);
+                        overMoney.setText("余额:" + money);
                     }
                 });
     }
@@ -526,12 +533,12 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
 
     @Override
     public void showProgress() {
-//        DialogProgressUtils.ShowDialogProgress(this);
+        //        DialogProgressUtils.ShowDialogProgress(this);
     }
 
     @Override
     public void hideProgress() {
-//        DialogProgressUtils.hideDialogProgress();
+        //        DialogProgressUtils.hideDialogProgress();
     }
 
     @Override
@@ -580,7 +587,7 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
         App.getDaoSession().getUserInfoDao().insert(userInfo);
 
         overMoney.setText("余额:" + userInfo.getAccountBalance());
-        nameTv.setText("账户:"+userInfo.getPhone());
+        nameTv.setText("账户:" + userInfo.getPhone());
     }
 
 
@@ -591,7 +598,7 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
         //        }
         if (goingOrder != null && goingOrder.size() != 0) {
             Log.i("正在进行的订单", goingOrder.toString());
-//            DialogProgressUtils.ShowDialogProgressWithMsg(this, "发现您有正在进行中的订单，正在为您跳转...");
+            //            DialogProgressUtils.ShowDialogProgressWithMsg(this, "发现您有正在进行中的订单，正在为您跳转...");
             //如果订单存在，请求具体订单
             OrderDetailPresenterImpl presenter = new OrderDetailPresenterImpl();
             presenter.injectView(this);
@@ -651,6 +658,7 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
             case location:
                 if (myLatLng != null) {
                     aMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myLatLng, nowZoom));
+                    backToOrigin = true;
                 }
                 break;
             case R.id.confirm_taxi:
@@ -682,12 +690,13 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
      * @param nearbyCarInfo
      */
     AlertDialog dialog;
+
     @Override
     public void showNearbyCarInfo(NearbyCarInfo nearbyCarInfo) {
         Log.i(TAG, nearbyCarInfo.toString());
         if (nearbyCarInfo.getNumber() == 0) {
             //如果附近没有车辆，提示用户
-            dialog =  new AlertDialog.Builder(this)
+            dialog = new AlertDialog.Builder(this)
                     .setTitle("提示")
                     .setMessage("很遗憾，附近没有可乘车辆，请换个地方试试")
                     .setPositiveButton("确定", new DialogInterface.OnClickListener() {
@@ -792,6 +801,12 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
             RegeocodeQuery query = new RegeocodeQuery(latLonPoint, 200, GeocodeSearch.AMAP);
             geocodeSearch.getFromLocationAsyn(query);
         }
+        if (backToOrigin) {
+            backToOrigin = false;
+            locationBt.setImageDrawable(getResources().getDrawable(R.drawable.has_location, null));
+        } else {
+            locationBt.setImageDrawable(getResources().getDrawable(R.drawable.location, null));
+        }
     }
 
     /**
@@ -869,7 +884,7 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
     /*********************************************************************************************/
     @Override
     protected void onDestroy() {
-        Log.i(TAG,"Destory");
+        Log.i(TAG, "Destory");
         super.onDestroy();
         //在activity执行onDestroy时执行mMapView.onDestroy()，销毁地图
         mMapView.onDestroy();
@@ -877,14 +892,14 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
             pw = null;//释放引用
         }
         ActivityStack.getScreenManager().popActivity(this);
-        if (dialog != null &&  dialog.isShowing()){
+        if (dialog != null && dialog.isShowing()) {
             dialog.dismiss();
             dialog = null;
         }
-//        DialogProgressUtils.clear();
-     
+        //        DialogProgressUtils.clear();
+
     }
-    
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -925,6 +940,26 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
             case R.id.author:
                 ToActivityUtil.toNextActivity(this, AboutUsActivity.class);
                 break;
+            case R.id.log_off:
+                new AlertDialog.Builder(this)
+                        .setTitle("提示")
+                        .setMessage("您确定要退出吗?")
+                        .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                dialogInterface.dismiss();
+                                SpUtil.remove(ShenZhouTaxiActivity.this, Constant.ACCESS_TOKEN);
+                                SpUtil.remove(ShenZhouTaxiActivity.this, Constant.REFRESH_ACCESS_TOKEN);
+                                SpUtil.remove(ShenZhouTaxiActivity.this, Constant.EXPIRED_TIME);
+                                ToActivityUtil.toNextActivityAndFinish(ShenZhouTaxiActivity.this, LoginActivity.class);
+                            }
+                        }).setNegativeButton("不，我点错了", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                    }
+                }).show();
+                break;
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -953,16 +988,16 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
         Intent intent1 = new Intent(this, WaitingDriverArriveActivity.class);
         intent1.putExtra(Constant.ORDER_DETAIL_INFO, orderDetailInfo);
         startActivity(intent1);
-//        DialogProgressUtils.hideDialogProgress();
+        //        DialogProgressUtils.hideDialogProgress();
         finish();//结束
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        Log.i(TAG,"onStop");
-//        DialogProgressUtils.hideDialogProgress();
-//        DialogProgressUtils.clear();
+        Log.i(TAG, "onStop");
+        //        DialogProgressUtils.hideDialogProgress();
+        //        DialogProgressUtils.clear();
     }
 
     private void getLocationPermission() {
@@ -980,7 +1015,7 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
         initRxBus();
         initRouteSearch();
     }
-    
+
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
