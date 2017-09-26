@@ -34,7 +34,7 @@ public class AboutTeamActivity extends BaseActivity {
         //不显示webview缩放按钮
         webSettings.setDisplayZoomControls(false);
         mWebView.setWebViewClient(new WebViewClient());
-        mWebView.loadUrl("http://nmid.cqupt.edu.cn/");
+        mWebView.loadUrl("https://nmid.cqupt.edu.cn/");
     }
 
     @Override
