@@ -64,6 +64,7 @@ public class LocationChooseActivity extends RxBusSubscriberBaseActivity implemen
         currentLocation = getIntent().getStringExtra(Constant.CURRENT_LOCATION);
         type = getIntent().getStringExtra(Constant.TYPE);
         Log.i(TAG,type);
+        Log.i(TAG,currentLocation);
         serviceId = getIntent().getIntExtra(Constant.SERVICE_ID,-1);
         if (currentCity != null) {
             cityChooseTv.setText(currentCity);
@@ -139,6 +140,7 @@ public class LocationChooseActivity extends RxBusSubscriberBaseActivity implemen
         @Override
         public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
             query = new InputtipsQuery(charSequence.toString(), currentCity);
+            query.setCityLimit(true);
             inputTips.setQuery(query);
             inputTips.requestInputtipsAsyn();
             

@@ -172,7 +172,7 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
     private String TAG = this.getClass().getSimpleName();
     private float nowZoom = 14f;
     private String nowCity;
-    private String addressStr;
+    private String locationStr;
     boolean userChooseLocation = false;
     private boolean isChooseEnd = false;
     private boolean hasCallTaxi = false;
@@ -211,6 +211,7 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
         public void onLocationChanged(AMapLocation aMapLocation) {
             Log.i(TAG, aMapLocation.toString());
             Log.i(TAG, "首次定位");
+            locationStr = aMapLocation.getAoiName();
             //逆地址解析
             double lat = aMapLocation.getLatitude();
             double lot = aMapLocation.getLongitude();
@@ -362,9 +363,7 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
         //设置定位模式为AMapLocationMode.Hight_Accuracy，高精度模式。
         mLocationOption.setLocationMode(AMapLocationClientOption.AMapLocationMode.Hight_Accuracy);
         //获取一次定位结果：
-        //获取最近3s内精度最高的一次定位结果：
-        //设置setOnceLocationLatest(boolean b)接口为true，启动定位时SDK会返回最近3s内精度最高的一次定位结果。如果设置其为true，setOnceLocation(boolean b)接口也会被设置为true，反之不会，默认为false。
-        mLocationOption.setOnceLocationLatest(true);
+        mLocationOption.setOnceLocation(true);
         //设置是否返回地址信息（默认返回地址信息）
         mLocationOption.setNeedAddress(true);
         //设置是否允许模拟位置,默认为true，允许模拟位置
@@ -375,7 +374,7 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
         mLocationClient.setLocationOption(mLocationOption);
         //启动定位
         mLocationClient.startLocation();
-
+        Log.i(TAG,"定位开始");
 
         /**
          * 搜索
@@ -399,13 +398,14 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
         pw.setFocusable(true);
 
         initDatas();
-        //价差是否存在已有订单
-        presenter.checkGoingOrder();
+       
 
     }
 
     private void initDatas() {
         presenter.getUserInfo();
+        //价差是否存在已有订单
+        presenter.checkGoingOrder();
     }
 
 
@@ -422,11 +422,10 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
         if (i == 1000) {
             RegeocodeAddress address = regeocodeResult.getRegeocodeAddress();
             nowCity = address.getCity();
-
             Log.i(TAG, address.getBuilding().toString());
             if (!userChooseLocation) {
                 //如果不是用户自己选择了地点，那么就自动定位
-                addressStr = address.getFormatAddress();
+                String  addressStr = address.getFormatAddress();
                 locationText.setText(addressStr);
                 //定位成功，显示为绿色
                 locationDot.setColor(getColor(R.color.green_500));
@@ -637,7 +636,7 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
                 //跳转到定位选择
                 Intent intent1 = new Intent(this, LocationChooseActivity.class);
                 intent1.putExtra(Constant.CURRENT_CITY, nowCity);
-                intent1.putExtra(Constant.CURRENT_LOCATION, addressStr);
+                intent1.putExtra(Constant.CURRENT_LOCATION, locationStr);
                 intent1.putExtra(Constant.TYPE, Constant.TYPE_START);
                 intent1.putExtra(Constant.SERVICE_ID, choosedServiceId);
                 startActivity(intent1);
