@@ -158,6 +158,9 @@ public class LocationChooseActivity extends RxBusSubscriberBaseActivity implemen
     @Override
     public void onGetInputtips(List<Tip> list, int i) {
         Log.i(TAG, list.toString());
+        if (list == null || list.size() == 0){
+            return;
+        }
         adapter.clear();
         adapter.addAll(list);
         adapter.notifyDataSetChanged();

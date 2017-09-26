@@ -68,7 +68,7 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseView
     protected void onDestroy() {
         super.onDestroy();
         ActivityStack.getScreenManager().popActivity(this);
-        App.getRefWatcher().watch(this);
+//        App.getRefWatcher().watch(this);
     }
     @Override
     public void showProgress() {

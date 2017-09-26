@@ -55,7 +55,7 @@ public class App extends Application {
         if (LeakCanary.isInAnalyzerProcess(this)){
             return;
         }
-        refWatcher = LeakCanary.install(this);
+//        refWatcher = LeakCanary.install(this);
 //        DiDiWebActivity.registerApp(this,"appid","secret");
     }
 

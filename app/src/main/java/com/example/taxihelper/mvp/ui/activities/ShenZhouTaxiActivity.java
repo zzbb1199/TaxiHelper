@@ -94,6 +94,7 @@ import com.example.taxihelper.utils.system.SpUtil;
 import com.example.taxihelper.utils.system.ToActivityUtil;
 import com.example.taxihelper.widget.CircleView;
 
+import java.nio.file.attribute.UserPrincipalLookupService;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -189,14 +190,7 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
     private LatLng centerLocation;//中心定位位置
     private RouteSearch routeSearch;
     TaxiResultInfoViewPager adapter;
-    /**
-     * 测试使用的数据
-     */
-    //    private double testLocationLat = 39.166798;
-    //    private double testLocationLot = 117.397561;
-    public static final int GONGWU_TYPE_GROUP = 2;
-    public static final int SHANGWU_TYPE_GROUP = 0;
-    public static final int HAOHUA_TYPE_GROUP = 7;
+
     /**
      * presenter
      */
@@ -271,6 +265,7 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
         routeSearch = new RouteSearch(this);
         routeSearch.setRouteSearchListener(this);
     }
+
 
     private void initRxBus() {
         RxBus.getDefault().toObservable(LocationChoose.class)
@@ -797,9 +792,14 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
             LatLonPoint latLonPoint = new LatLonPoint(centerLatLng.latitude, centerLatLng.longitude);
             //解析当前点
             //搜索开始前，清空文本
-            locationText.setText("正在加载地址，请稍后...");
-            RegeocodeQuery query = new RegeocodeQuery(latLonPoint, 200, GeocodeSearch.AMAP);
-            geocodeSearch.getFromLocationAsyn(query);
+            Log.i(TAG, String.valueOf(userChooseLocation));
+            if (!userChooseLocation) {
+                locationText.setText("正在加载地址，请稍后...");
+                RegeocodeQuery query = new RegeocodeQuery(latLonPoint, 200, GeocodeSearch.AMAP);
+                geocodeSearch.getFromLocationAsyn(query);
+            }
+            userChooseLocation = false;
+
         }
         if (backToOrigin) {
             backToOrigin = false;

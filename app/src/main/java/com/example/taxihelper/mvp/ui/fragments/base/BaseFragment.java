@@ -73,7 +73,7 @@ public abstract class BaseFragment extends Fragment implements BaseView{
         if (mSubsription != null && mSubsription.isUnsubscribed()) {
             mSubsription.unsubscribe();
         }
-        App.getRefWatcher().watch(this);
+//        App.getRefWatcher().watch(this);
     }
 
     @Override
