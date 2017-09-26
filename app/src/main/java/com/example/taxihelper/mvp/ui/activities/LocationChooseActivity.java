@@ -63,6 +63,7 @@ public class LocationChooseActivity extends RxBusSubscriberBaseActivity implemen
         currentCity = getIntent().getStringExtra(Constant.CURRENT_CITY);
         currentLocation = getIntent().getStringExtra(Constant.CURRENT_LOCATION);
         type = getIntent().getStringExtra(Constant.TYPE);
+        Log.i(TAG,type);
         serviceId = getIntent().getIntExtra(Constant.SERVICE_ID,-1);
         if (currentCity != null) {
             cityChooseTv.setText(currentCity);
@@ -77,7 +78,7 @@ public class LocationChooseActivity extends RxBusSubscriberBaseActivity implemen
         listView.setAdapter(adapter);
         adapter.setOnItemClickListener(this);
         //初始化搜索
-        if (type == Constant.TYPE_START){
+        if (type.equals(Constant.TYPE_START)){
             getSupportActionBar().setTitle("选择上车地点");
             query = new InputtipsQuery(currentLocation, currentCity);
             query.setCityLimit(true);//限制在当前城市
