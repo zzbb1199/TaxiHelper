@@ -94,7 +94,7 @@ import com.example.taxihelper.utils.system.SpUtil;
 import com.example.taxihelper.utils.system.ToActivityUtil;
 import com.example.taxihelper.widget.CircleView;
 
-import java.nio.file.attribute.UserPrincipalLookupService;
+
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -318,8 +318,8 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         View header = navigationView.inflateHeaderView(R.layout.nav_header_main);
-        nameTv = header.findViewById(R.id.name);
-        overMoney = header.findViewById(R.id.overage_money);
+        nameTv = (TextView) header.findViewById(R.id.name);
+        overMoney = (TextView) header.findViewById(R.id.overage_money);
         navigationView.setNavigationItemSelectedListener(this);
 
         /**
