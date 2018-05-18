@@ -25,9 +25,10 @@ public class AboutTeamActivity extends BaseActivity {
 
     @InjectView(R.id.about_team_web_view)
     WebView mWebView;
-    private final int TIME_OUT = 1;
+    private static final int TIME_OUT = 1;
     private Timer timer;
-    private Handler handler = new Handler() {
+    private  MyHandler handler = new MyHandler();
+    private static class MyHandler extends Handler{
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
@@ -36,8 +37,7 @@ public class AboutTeamActivity extends BaseActivity {
 //                finish();
             }
         }
-    };
-
+    }
     @Override
     public void initInjector() {
 

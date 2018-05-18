@@ -3,10 +3,10 @@ package com.example.taxihelper.mvp.ui.activities;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -42,9 +42,14 @@ public class WaitingDriveAcceptActivity extends RxBusSubscriberBaseActivity impl
 
     @InjectView(R.id.current_status)
     TextView currentStatus;
-    @InjectView(R.id.accept)
-    Button accept;
+//    @InjectView(R.id.accept)
+//   Button accept;
+    @InjectView(R.id.wait_time)
+    TextView waitTime;
+    int currentSeconds = 0;
+    int currentMinute = 0;
     private String orderId;
+    int totalWaitTime = 6;
     @Inject
     AcceptOrderPresenterImpl presenter;
     int count = 0;//总共9个流程
@@ -68,7 +73,9 @@ public class WaitingDriveAcceptActivity extends RxBusSubscriberBaseActivity impl
         Intent intent = new Intent(this, OrderDetailService.class);
         intent.putExtra(Constant.ORDER_ID, orderId);
         startService(intent);
-
+        //计时开始
+        TimeCount timeCount = new TimeCount(totalWaitTime*60*1000,1000);
+        timeCount.start();
     }
 
     @Override
@@ -86,8 +93,8 @@ public class WaitingDriveAcceptActivity extends RxBusSubscriberBaseActivity impl
                         //得到信息后，传给下一个Activity
                         //成功有人接单
                         Log.i(TAG, orderDetailInfo.toString());
-                        Intent intent = new Intent(WaitingDriveAcceptActivity.this,WaitingDriverArriveActivity.class);
-                        intent.putExtra(Constant.ORDER_DETAIL_INFO,orderDetailInfo);
+                        Intent intent = new Intent(WaitingDriveAcceptActivity.this, WaitingDriverArriveActivity.class);
+                        intent.putExtra(Constant.ORDER_DETAIL_INFO, orderDetailInfo);
                         startActivity(intent);
                         finish();
                     }
@@ -106,7 +113,7 @@ public class WaitingDriveAcceptActivity extends RxBusSubscriberBaseActivity impl
     @Override
     public void showOrderStatus(OrderStatus orderStatus) {
         Log.i(TAG, orderStatus.toString());
-        accept.setClickable(count <= 8 ? true : false);
+//        accept.setClickable(count <= 8 ? true : false);
         count++;
         currentStatus.setText(STATUS[count]);
 
@@ -114,7 +121,7 @@ public class WaitingDriveAcceptActivity extends RxBusSubscriberBaseActivity impl
 
     @Override
     public void onError() {
-        accept.setClickable(count <= 8 ? true : false);
+//        accept.setClickable(count <= 8 ? true : false);
     }
 
     @Override
@@ -123,6 +130,7 @@ public class WaitingDriveAcceptActivity extends RxBusSubscriberBaseActivity impl
     }
 
     AlertDialog dialog = null;
+
     @Override
     public void cancelReson(List<CancelOrderReason> cancelOrderReason) {
         Log.i(TAG, cancelOrderReason.toString());
@@ -131,8 +139,8 @@ public class WaitingDriveAcceptActivity extends RxBusSubscriberBaseActivity impl
         LinearLayout container = (LinearLayout) inflater.inflate(R.layout.dialog_cancel_reason, null);
         for (CancelOrderReason reason : cancelOrderReason) {
             final TextView tv = (TextView) inflater.inflate(R.layout.cancel_reason_item, null);
-            int dp8 = DensityUtil.dip2px(this,8);
-            tv.setPadding(dp8,dp8,dp8,dp8);
+            int dp8 = DensityUtil.dip2px(this, 8);
+            tv.setPadding(dp8, dp8, dp8, dp8);
             tv.setText(reason.getValue());
             tv.setTag(reason.getId());
             tv.setOnClickListener(new View.OnClickListener() {
@@ -150,6 +158,18 @@ public class WaitingDriveAcceptActivity extends RxBusSubscriberBaseActivity impl
         dialog.show();
 
     }
+    private void addTime() {
+        currentSeconds++;
+        if(currentSeconds < 10){
+            waitTime.setText(0+""+currentMinute+":"+"0"+currentSeconds);
+        }else if(currentSeconds < 60){
+            waitTime.setText(0+""+currentMinute+":"+currentSeconds);
+        }else if(currentSeconds == 60){
+            currentMinute++;
+            currentSeconds = 0;
+            waitTime.setText(0+""+currentMinute+":"+currentSeconds);    
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -158,16 +178,32 @@ public class WaitingDriveAcceptActivity extends RxBusSubscriberBaseActivity impl
         ButterKnife.inject(this);
     }
 
-    @OnClick({R.id.accept, R.id.cancel_order})
+    @OnClick({R.id.cancel_order})
     public void onViewClicked(View view) {
         switch (view.getId()) {
-            case R.id.accept:
-                accept.setClickable(false);
-                presenter.changOrderStatus(orderId, Constant.SHANGWU_DRIVER, Constant.ORDER_STATUS[count]);
-                break;
             case R.id.cancel_order:
                 presenter.cancelOrderReason();
                 break;
         }
     }
+    
+    
+    class TimeCount extends CountDownTimer {
+        public TimeCount(long millisInFuture, long countDownInterval) {
+            super(millisInFuture, countDownInterval);
+        }
+
+        @Override
+        public void onTick(long l) {
+            addTime();
+        }
+
+        @Override
+        public void onFinish() {
+            ToastUtil.shortToast("等待时间已超"+totalWaitTime + "分钟" + "，建议取消订单");
+        }
+    }
+
+   
+
 }

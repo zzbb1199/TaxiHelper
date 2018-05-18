@@ -97,6 +97,6 @@ public class Constant {
     public static final String ORDER_DETAIL_INFO = "orderDetailInfo";
 
 
-
+    public static final String TAXI_PRICE = "taxi_price_data"; 
 
 }

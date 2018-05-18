@@ -28,6 +28,7 @@ import com.example.taxihelper.mvp.ui.activities.HistoryOrderActivity;
 import com.example.taxihelper.mvp.ui.activities.LoginActivity;
 import com.example.taxihelper.mvp.ui.activities.ShenZhouTaxiActivity;
 import com.example.taxihelper.mvp.ui.activities.WaitingDriveAcceptActivity;
+import com.example.taxihelper.mvp.ui.activities.WaitingDriverArriveActivity;
 
 import dagger.Component;
 
@@ -53,6 +54,5 @@ public interface ActivityComponent {
 
     void inject(HistoryOrderActivity historyOrderActivity);
     //    void inject(ChargeActivity chargeActivity);
-
-
+    void inject(WaitingDriverArriveActivity waitingDriverArriveActivity);
 }

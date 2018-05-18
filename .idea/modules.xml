@@ -3,11 +3,9 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/TaxiHelper.iml" filepath="$PROJECT_DIR$/TaxiHelper.iml" />
-      <module fileurl="file://$PROJECT_DIR$/TaxiHelper.iml" filepath="$PROJECT_DIR$/TaxiHelper.iml" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/didi_sdk_for_common_v1.1.0_05_28/didi_sdk_for_common_v1.1.0_05_28.iml" filepath="$PROJECT_DIR$/didi_sdk_for_common_v1.1.0_05_28/didi_sdk_for_common_v1.1.0_05_28.iml" />
-      <module fileurl="file://$PROJECT_DIR$/didi_sdk_for_common_v1.1.0_05_28/didi_sdk_for_common_v1.1.0_05_28.iml" filepath="$PROJECT_DIR$/didi_sdk_for_common_v1.1.0_05_28/didi_sdk_for_common_v1.1.0_05_28.iml" />
+      <module fileurl="file://$PROJECT_DIR$/taxidriver/taxidriver.iml" filepath="$PROJECT_DIR$/taxidriver/taxidriver.iml" />
     </modules>
   </component>
 </project>

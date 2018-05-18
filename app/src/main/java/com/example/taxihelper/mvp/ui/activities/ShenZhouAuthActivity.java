@@ -1,7 +1,6 @@
 package com.example.taxihelper.mvp.ui.activities;
 
 import android.graphics.Bitmap;
-import android.util.Log;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -12,6 +11,9 @@ import com.example.taxihelper.mvp.ui.activities.base.BaseActivity;
 import com.example.taxihelper.utils.image.ToastUtil;
 import com.example.taxihelper.utils.system.RxBus;
 import com.example.taxihelper.utils.system.SpUtil;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import butterknife.InjectView;
 
@@ -59,8 +61,7 @@ public class ShenZhouAuthActivity extends BaseActivity {
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
                 count += 1;
-                Log.i(TAG, count + "");
-                
+
                 if (url.equals("client_id=A73371C10000030A&redirect_uri=http://nmid.cqupt.edu.cn/&response_type=code&scope=read&mobile="+phoneNum)){
                     //如果得到了如上所示的url，
                     String accessToken = SpUtil.getString(ShenZhouAuthActivity.this,Constant.ACCESS_TOKEN,null);
@@ -71,19 +72,20 @@ public class ShenZhouAuthActivity extends BaseActivity {
                     }
                     //如果过期了这个返回值是什么？？？，暂时未知
                 }
-                
+
                 if (count == 3){//已经在授权期限内
-                    String redirectUrl = url.split("[?]")[0];
-                    if (redirectUrl.equals(Constant.SHENZHOUE_REDIRECT_URL)){
-                        //判定是否跳转到最后
-                        String code_url = url.split("[?]")[1];
-                        String code = code_url.substring(code_url.indexOf("=")+1, code_url.length());
+                    //重定向到研究中心主页
+                    String regex = "code=(.*)";
+                    Pattern pattern = Pattern.compile(regex);
+                    Matcher matcher = pattern.matcher(url);
+                    if(matcher.find()){
+                        String code = matcher.group(1);
                         RxBus.getDefault().post(code);
                         finish();
                         return;
                     }
                 }
-                
+
                 if (count == 4) {//为重新获取了code
                     //4次以后
                     String code_url = url.split("[?]")[1];
@@ -92,6 +94,7 @@ public class ShenZhouAuthActivity extends BaseActivity {
                     finish();
                 }
             }
+
         });
     }
 

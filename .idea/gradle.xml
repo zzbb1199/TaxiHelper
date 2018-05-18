@@ -10,6 +10,7 @@
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/didi_sdk_for_common_v1.1.0_05_28" />
+            <option value="$PROJECT_DIR$/taxidriver" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />

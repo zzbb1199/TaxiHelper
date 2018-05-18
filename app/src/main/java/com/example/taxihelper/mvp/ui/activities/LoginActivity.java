@@ -19,6 +19,8 @@ import com.example.taxihelper.utils.system.RxBus;
 import com.example.taxihelper.utils.system.SpUtil;
 import com.example.taxihelper.utils.system.ToActivityUtil;
 
+import java.util.regex.Pattern;
+
 import javax.inject.Inject;
 
 import butterknife.ButterKnife;
@@ -59,7 +61,6 @@ public class LoginActivity extends RxBusSubscriberBaseActivity implements GainAc
         if (expiredTime > System.currentTimeMillis()) {
             //还在授权期限内
             ToActivityUtil.toNextActivityAndFinish(this, ShenZhouTaxiActivity.class);
-            return;
         }
 
     }
@@ -87,9 +88,11 @@ public class LoginActivity extends RxBusSubscriberBaseActivity implements GainAc
         switch (view.getId()) {
             case R.id.login:
                 String phoneNumber = phoneNumberInput.getText().toString();
-                if (phoneNumber.length() != 11){
-                    ToastUtil.shortToast("输入还有错哦，请重新输入");
-                    return;
+                //采用正则表达式验证
+                String regex = "1[358]\\d{9}";
+                if(!Pattern.matches(regex,phoneNumber)){
+                   ToastUtil.shortToast("输入格式不规范，请重新输入");
+                   return;
                 }
                 Intent intent = new Intent(this,ShenZhouAuthActivity.class);
                 intent.putExtra(Constant.PHONE_NUM,phoneNumber);

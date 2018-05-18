@@ -19,7 +19,6 @@ import android.support.annotation.RequiresApi;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
@@ -27,11 +26,11 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
+import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
@@ -74,10 +73,12 @@ import com.example.taxihelper.mvp.contract.TaxiContract;
 import com.example.taxihelper.mvp.entity.CityInfo;
 import com.example.taxihelper.mvp.entity.CreateOrder;
 import com.example.taxihelper.mvp.entity.GoingOrder;
+import com.example.taxihelper.mvp.entity.GroupId;
 import com.example.taxihelper.mvp.entity.LocationChoose;
 import com.example.taxihelper.mvp.entity.NearbyCarInfo;
 import com.example.taxihelper.mvp.entity.OrderDetailInfo;
 import com.example.taxihelper.mvp.entity.RefreshMoney;
+import com.example.taxihelper.mvp.entity.TaxiPriceData;
 import com.example.taxihelper.mvp.entity.TaxiPriceInfo;
 import com.example.taxihelper.mvp.entity.UserInfo;
 import com.example.taxihelper.mvp.presenter.OrderDetailPresenterImpl;
@@ -94,9 +95,10 @@ import com.example.taxihelper.utils.system.SpUtil;
 import com.example.taxihelper.utils.system.ToActivityUtil;
 import com.example.taxihelper.widget.CircleView;
 
-
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -122,6 +124,8 @@ import static com.example.taxihelper.R.id.location;
 public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContract.View, GeocodeSearch.OnGeocodeSearchListener, AMap.OnCameraChangeListener, RouteSearch.OnRouteSearchListener, AMap.OnMapLoadedListener, NavigationView.OnNavigationItemSelectedListener, OrderDetailContract.View {
 
 
+    //声明AMapLocationClient类对象
+    public AMapLocationClient mLocationClient = null;
     @InjectView(R.id.location_dot)
     CircleView locationDot;
     @InjectView(R.id.location_text)
@@ -147,8 +151,7 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
     LinearLayout locationView;
     @InjectView(R.id.go_to_view)
     LinearLayout goToView;
-    @InjectView(R.id.confirm_taxi)
-    Button confirmTaxi;
+
     @InjectView(R.id.app_bar_layout)
     AppBarLayout appBarLayout;
     @InjectView(R.id.center_image)
@@ -159,12 +162,41 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
     LinearLayout mainContainer;
     @InjectView(R.id.location)
     ImageView locationBt;
+    boolean userChooseLocation = false;
+    double slat, slot, elat, elot;
+    TaxiResultInfoViewPager adapter;
+    /**
+     * presenter
+     */
+    @Inject
+    TaxiPresenterImpl presenter;
+    /**
+     * 地图相关
+     */
+    MyLocationStyle myLocationStyle;
+    GeocodeSearch geocodeSearch;
+    MapView mMapView = null;
+    /**
+     * 附近车辆
+     *
+     * @param nearbyCarInfo
+     */
+    AlertDialog dialog;
+    /**
+     * 格式控制器
+     */
+    DecimalFormat df = new DecimalFormat("#.0");
+    /**
+     * 地图层移动监听 用来根据屏幕中心来进行移动定位位置显示
+     *
+     * @param cameraPosition
+     */
+    //记录屏幕中心点的辅助变量
+    boolean isFirstRecocd = true;
     private LinearLayout typeLinear;
     private PopupWindow pw;
     private TextView nameTv;
     private TextView overMoney;
-
-
     /**
      * 辅助变量
      */
@@ -173,38 +205,18 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
     private float nowZoom = 14f;
     private String nowCity;
     private String locationStr;
-    boolean userChooseLocation = false;
     private boolean isChooseEnd = false;
     private boolean hasCallTaxi = false;
     private boolean isFirstMapLoad = false;
-    double slat, slot, elat, elot;
     private int choosedServiceId = 14;//默认为立即叫车
     private String estimateId;
     private String passengerName = "张兴锐";
     private String passengerMobile = "15086943358";
-
     private int startCityId;
     private int screenCenterX;
     private int screenCenterY;
     private LatLng myLatLng;//自动定位的位置
     private LatLng centerLocation;//中心定位位置
-    private RouteSearch routeSearch;
-    TaxiResultInfoViewPager adapter;
-
-    /**
-     * presenter
-     */
-    @Inject
-    TaxiPresenterImpl presenter;
-
-    /**
-     * 地图相关
-     */
-    MyLocationStyle myLocationStyle;
-    GeocodeSearch geocodeSearch;
-    MapView mMapView = null;
-    //声明AMapLocationClient类对象
-    public AMapLocationClient mLocationClient = null;
     //声明定位回调监听器
     public AMapLocationListener mLocationListener = new AMapLocationListener() {
         @Override
@@ -225,15 +237,21 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
             if (myLatLng != null) {
                 aMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myLatLng, nowZoom));//触发地图层移动，致使定位后续操作
                 //定位完成，设置
-                locationBt.setImageDrawable(getResources().getDrawable(R.drawable.has_location, null));
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    locationBt.setImageDrawable(getResources().getDrawable(R.drawable.has_location, null));
+                }
             }
 
 
         }
     };
+    private RouteSearch routeSearch;
     private boolean backToOrigin = true;
+    private int nowIndex = 0;
 
-
+    /**
+     * 初始化
+     */
     public void initInjector() {
         mActivityComponent.inject(this);
         presenter.injectView(this);
@@ -260,13 +278,14 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
 
     }
 
-
     /*初始化 搜索路线所需的类*/
     private void initRouteSearch() {
         routeSearch = new RouteSearch(this);
         routeSearch.setRouteSearchListener(this);
     }
 
+
+    //返回了搜索结果 
 
     private void initRxBus() {
         RxBus.getDefault().toObservable(LocationChoose.class)
@@ -298,8 +317,20 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
                         overMoney.setText("余额:" + money);
                     }
                 });
+        RxBus.getDefault().toObservable(GroupId.class)
+                .subscribe(new Action1<GroupId>() {
+                    @Override
+                    public void call(GroupId id) {
+                        taxiResultInfo.setVisibility(View.INVISIBLE);
+                        //进行叫车，判断是什么车的类型
+                        int carGroupId = id.groupdId;
+                        String startName = locationText.getText().toString().trim();
+                        String endName = goToText.getText().toString().trim();
+                        presenter.createOrder(choosedServiceId, carGroupId, passengerMobile, passengerName, slat, slot
+                                , startName, startName, endName, endName, elat, elot, estimateId);
+                    }
+                });
     }
-
 
     @TargetApi(Build.VERSION_CODES.M)
     public void initViews() {
@@ -374,7 +405,7 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
         mLocationClient.setLocationOption(mLocationOption);
         //启动定位
         mLocationClient.startLocation();
-        Log.i(TAG,"定位开始");
+        Log.i(TAG, "定位开始");
 
         /**
          * 搜索
@@ -398,7 +429,7 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
         pw.setFocusable(true);
 
         initDatas();
-       
+
 
     }
 
@@ -407,7 +438,6 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
         //价差是否存在已有订单
         presenter.checkGoingOrder();
     }
-
 
     /**
      * 坐标转文字
@@ -425,16 +455,13 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
             Log.i(TAG, address.getBuilding().toString());
             if (!userChooseLocation) {
                 //如果不是用户自己选择了地点，那么就自动定位
-                String  addressStr = address.getFormatAddress();
+                String addressStr = address.getFormatAddress();
                 locationText.setText(addressStr);
                 //定位成功，显示为绿色
                 locationDot.setColor(getColor(R.color.green_500));
             }
         }
     }
-
-
-    //返回了搜索结果 
 
     /**
      * 文字转坐标
@@ -518,7 +545,6 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
         routeSearch.calculateDriveRouteAsyn(driveRouteQuery);
     }
 
-
     /*********************************************************************************************/
 
     public int getLayout() {
@@ -527,20 +553,18 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
 
     @Override
     public void showProgress() {
-        //        DialogProgressUtils.ShowDialogProgress(this);
+        //                DialogProgressUtils.ShowDialogProgress(this);
     }
 
     @Override
     public void hideProgress() {
-        //        DialogProgressUtils.hideDialogProgress();
+        //                DialogProgressUtils.hideDialogProgress();
     }
 
     @Override
     public void showMsg(String msg) {
         ToastUtil.shortToast(msg);
     }
-
-    private int nowIndex = 0;
 
     @TargetApi(Build.VERSION_CODES.M)
     @Override
@@ -583,7 +607,6 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
         overMoney.setText("余额:" + userInfo.getAccountBalance());
         nameTv.setText("账户:" + userInfo.getPhone());
     }
-
 
     @Override
     public void showGoingOrderResult(List<GoingOrder> goingOrder) {
@@ -628,8 +651,7 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
         });
     }
 
-
-    @OnClick({R.id.location_view, R.id.go_to_view, location, R.id.confirm_taxi, R.id.type_choose})
+    @OnClick({R.id.location_view, R.id.go_to_view, location, R.id.type_choose})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.location_view:
@@ -655,16 +677,6 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
                     backToOrigin = true;
                 }
                 break;
-            case R.id.confirm_taxi:
-                taxiResultInfo.setVisibility(View.INVISIBLE);
-                //进行叫车，判断是什么车的类型
-                int pos = viewPager.getCurrentItem();
-                int carGroupId = ((TaxiKindsFragment) adapter.getItem(pos)).getCargroupid();
-                String startName = locationText.getText().toString().trim();
-                String endName = goToText.getText().toString().trim();
-                presenter.createOrder(choosedServiceId, carGroupId, passengerMobile, passengerName, slat, slot
-                        , startName, startName, endName, endName, elat, elot, estimateId);
-                break;
             case R.id.type_choose:
                 pw.update();
                 pw.showAsDropDown(typeChoose);
@@ -677,13 +689,6 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
         locationView.setClickable(clickAble);
         goToView.setClickable(clickAble);
     }
-
-    /**
-     * 附近车辆
-     *
-     * @param nearbyCarInfo
-     */
-    AlertDialog dialog;
 
     @Override
     public void showNearbyCarInfo(NearbyCarInfo nearbyCarInfo) {
@@ -712,11 +717,6 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
     }
 
     /**
-     * 格式控制器
-     */
-    DecimalFormat df = new DecimalFormat("#.0");
-
-    /**
      * 打车价格结果
      *
      * @param taxiPriceInfo
@@ -727,17 +727,40 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
         //加入车辆
         taxiResultInfo.setVisibility(View.VISIBLE);
         estimateId = taxiPriceInfo.getEstimateId();
-        distanceTv.setText("预估距离:" + df.format(taxiPriceInfo.getDistance() / 1000) + "km");
-        timeCostTv.setText("预计耗时:" + taxiPriceInfo.getDuration() + "min");
+        distanceTv.setText(Html.fromHtml("预估距离：<font color=red>" + df.format(taxiPriceInfo.getDistance() / 1000) + "km" + "</font>"));
+        timeCostTv.setText(Html.fromHtml("预计耗时：<font color=red>" + taxiPriceInfo.getDuration() + "min" + "</font>"));
+
         List<Fragment> fragments = new ArrayList<>();
         adapter.clear();
-        //初始化Fragment
+
+        ArrayList<TaxiPriceData> priceDataList = new ArrayList<>();
+        //先加入神州打车价格
         for (TaxiPriceInfo.PricesBean prices : taxiPriceInfo.getPrices()) {
+            priceDataList.add(new TaxiPriceData("神州", prices.getName(), prices.getPrice(),prices.getCarGroupId()));
+        }
+        //再加入滴滴打车
+        priceDataList.addAll(myDiDiPrice(taxiPriceInfo.getDistance() / 1000));
+        //排序
+        Collections.sort(priceDataList);
+        //初始化Fragment
+
+        ArrayList<TaxiPriceData> list = new ArrayList<>();
+        for (int i = 0; i < priceDataList.size(); i++) {
+            if (i != 0 && i % 3 == 0) {
+                Fragment fragment = new TaxiKindsFragment();
+                Bundle bundle = new Bundle();
+                bundle.putParcelableArrayList(Constant.TAXI_PRICE, list);
+                fragment.setArguments(bundle);
+                fragments.add(fragment);
+                list = new ArrayList<>();
+            }
+            list.add(priceDataList.get(i));
+        }
+        if (list.size() != 0) {
+            //说明数目未整除3
             Fragment fragment = new TaxiKindsFragment();
             Bundle bundle = new Bundle();
-            bundle.putString(Constant.CAR_TYPE, prices.getName());
-            bundle.putFloat(Constant.CAR_PRICES, prices.getPrice());
-            bundle.putInt(Constant.CAR_GROUP_ID, prices.getCarGroupId());
+            bundle.putParcelableArrayList(Constant.TAXI_PRICE, list);
             fragment.setArguments(bundle);
             fragments.add(fragment);
         }
@@ -745,19 +768,49 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
         adapter.notifyDataSetChanged();
     }
 
+    /**
+     * @param miles 形成公里数
+     * @return
+     */
+    private List<TaxiPriceData> myDiDiPrice(float miles) {
+        Calendar c = Calendar.getInstance();
+        c.setTimeInMillis(System.currentTimeMillis());
+        int hour = c.get(Calendar.HOUR_OF_DAY);
+        List<TaxiPriceData> list = new ArrayList<>();
+        //专车
+        double everMilePrice ;
+        if (0 <= hour && hour < 5) {
+            everMilePrice = 3.4;
+        } else if (hour < 7) {
+            everMilePrice = 2.5;
+        } else if (hour < 9) {
+            everMilePrice = 2.8;
+        } else if (hour < 17) {
+            everMilePrice = 2.1;
+        } else if (hour < 23) {
+            everMilePrice = 2.7;
+        } else {
+            everMilePrice = 3.4;
+        }
+        TaxiPriceData priceData = new TaxiPriceData("滴滴", "专车", 11 + everMilePrice * (miles - 3),-1);
+        list.add(priceData);
+        //快车
+        if (0 <= hour && hour < 6) {
+            everMilePrice = 1.9;
+        } else if (hour < 1.4) {
+            everMilePrice = 1.4;
+        } else {
+            everMilePrice = 1.9;
+        }
+        priceData = new TaxiPriceData("滴滴", "快车", 11 + everMilePrice * (miles - 3),-1);
+        list.add(priceData);
+        return list;
+    }
 
     @Override
     public void onCameraChange(CameraPosition cameraPosition) {
 
     }
-
-
-    /**
-     * 地图层移动监听 用来根据屏幕中心来进行移动定位位置显示
-     *
-     * @param cameraPosition
-     */
-    boolean isFirstRecocd = true;//记录屏幕中心点的辅助变量
 
     @Override
     public void onCameraChangeFinish(CameraPosition cameraPosition) {
@@ -802,9 +855,13 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
         }
         if (backToOrigin) {
             backToOrigin = false;
-            locationBt.setImageDrawable(getResources().getDrawable(R.drawable.has_location, null));
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                locationBt.setImageDrawable(getResources().getDrawable(R.drawable.has_location, null));
+            }
         } else {
-            locationBt.setImageDrawable(getResources().getDrawable(R.drawable.location, null));
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                locationBt.setImageDrawable(getResources().getDrawable(R.drawable.location, null));
+            }
         }
     }
 
