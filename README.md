@@ -1,4 +1,4 @@
-# TaxiHepler
+﻿# TaxiHepler
 打车比价项目（第六届重庆市雏鹰计划项目 ），Android客户端。
 
 Table of Contents
@@ -20,7 +20,6 @@ Table of Contents
     * [3\.2 技术支持](#32-%E6%8A%80%E6%9C%AF%E6%94%AF%E6%8C%81)
   * [4 最后](#4-%E6%9C%80%E5%90%8E)
 
-Created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc.go)
 
 ## 1.概要
 
