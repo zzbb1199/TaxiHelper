@@ -3,7 +3,7 @@ package com.example.taxihelper.mvp.entity;
 import com.google.gson.annotations.SerializedName;
 
 /**
- * Created by 张兴锐 on 2017/8/8.
+ * Created by Raven on 2017/8/8.
  */
 
 public class CityInfo {

@@ -117,7 +117,7 @@ import rx.functions.Action1;
 import static com.example.taxihelper.R.id.location;
 
 /**
- * Created by 张兴锐 on 2017/8/8.
+ * Created by Raven on 2017/8/8.
  */
 
 @RuntimePermissions
@@ -210,7 +210,7 @@ public class ShenZhouTaxiActivity extends AppCompatActivity implements TaxiContr
     private boolean isFirstMapLoad = false;
     private int choosedServiceId = 14;//默认为立即叫车
     private String estimateId;
-    private String passengerName = "张兴锐";
+    private String passengerName = "Raven";
     private String passengerMobile = "15086943358";
     private int startCityId;
     private int screenCenterX;

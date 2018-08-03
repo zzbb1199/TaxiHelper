@@ -6,7 +6,7 @@ import com.example.taxihelper.mvp.entity.GainAccessToken;
 import rx.Observable;
 
 /**
- * Created by 张兴锐 on 2017/8/7.
+ * Created by Raven on 2017/8/7.
  */
 
 public interface GainAccessTokenContract {

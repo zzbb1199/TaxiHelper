@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by 张兴锐 on 2017/8/13.
+ * Created by Raven on 2017/8/13.
  */
 
 public class CityChooseHeaderAdapter implements StickyHeaderDecoration.IStickyHeaderAdapter<CityChooseHeaderAdapter.HeaderHolder> {

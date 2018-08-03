@@ -11,7 +11,7 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
 /**
- * Created by 张兴锐 on 2017/9/8.
+ * Created by Raven on 2017/9/8.
  */
 
 public class CommentPresenterImpl extends BasePresenterImpl implements CommentContract.Presenter {

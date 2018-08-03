@@ -11,7 +11,7 @@ import javax.inject.Inject;
 import rx.Observable;
 
 /**
- * Created by 张兴锐 on 2017/8/13.
+ * Created by Raven on 2017/8/13.
  */
 
 public class GetCitiesInfoModelImpl extends BaseModelImpl implements GetCitiesInfoContract.Model {

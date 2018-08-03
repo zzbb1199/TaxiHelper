@@ -8,7 +8,7 @@ import com.example.taxihelper.R;
 import com.example.taxihelper.mvp.ui.activities.base.BaseActivity;
 
 /**
- * Created by 张兴锐 on 2017/9/6.
+ * Created by Raven on 2017/9/6.
  */
 
 public class AboutUsActivity extends BaseActivity {

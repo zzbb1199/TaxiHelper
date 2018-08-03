@@ -18,7 +18,7 @@ import java.util.TimerTask;
 import butterknife.InjectView;
 
 /**
- * Created by 张兴锐 on 2017/9/6.
+ * Created by Raven on 2017/9/6.
  */
 
 public class AboutTeamActivity extends BaseActivity {

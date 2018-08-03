@@ -12,7 +12,7 @@ import android.view.View;
 import com.example.taxihelper.R;
 
 /**
- * Created by 张兴锐 on 2017/8/9.
+ * Created by Raven on 2017/8/9.
  */
 
 public class CircleView extends View {

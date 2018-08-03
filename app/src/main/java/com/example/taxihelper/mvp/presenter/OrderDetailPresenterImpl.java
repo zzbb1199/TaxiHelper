@@ -12,7 +12,7 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
 /**
- * Created by 张兴锐 on 2017/8/26.
+ * Created by Raven on 2017/8/26.
  */
 
 public class OrderDetailPresenterImpl extends BasePresenterImpl<OrderDetailContract.View> implements OrderDetailContract.Presenter {

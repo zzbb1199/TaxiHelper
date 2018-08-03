@@ -6,7 +6,7 @@ import android.support.annotation.Nullable;
 import rx.Subscription;
 
 /**
- * Created by 张兴锐 on 2017/9/8.
+ * Created by Raven on 2017/9/8.
  */
 
 public abstract class RxBusBaseFragment extends BaseFragment {

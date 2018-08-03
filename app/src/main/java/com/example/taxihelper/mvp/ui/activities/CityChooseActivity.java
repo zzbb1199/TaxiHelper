@@ -30,7 +30,7 @@ import javax.inject.Inject;
 import butterknife.InjectView;
 
 /**
- * Created by 张兴锐 on 2017/8/11.
+ * Created by Raven on 2017/8/11.
  */
 
 public class CityChooseActivity extends BaseActivity implements GetCitiesInfoContract.View, RecyclerArrayAdapter.OnItemClickListener {

@@ -7,7 +7,7 @@ import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Unique;
 
 /**
- * Created by 张兴锐 on 2017/8/25.
+ * Created by Raven on 2017/8/25.
  */
 @Entity
 public class UserInfo {
